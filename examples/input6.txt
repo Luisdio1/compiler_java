@@ -1,7 +1,0 @@
-x = 3; 
-y = 2; 
-z = x / y; 
-print( z );
-
-/* not initialized variable */
-z = x + y + w; 

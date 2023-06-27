@@ -1,6 +1,0 @@
-/* Example 5 */
-x = "hello";
-y = " world";
-print(x + y + "!\n");
-
-print(3 + "4" + " = 34\n");
