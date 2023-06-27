@@ -1,0 +1,223 @@
+/**
+ *  This code is part of the lab exercises for the Compilers course
+ *  at Harokopio University of Athens, Dept. of Informatics and Telematics.
+ */
+
+import java_cup.runtime.Symbol;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+parser code
+{:
+    private static final Logger LOGGER = LoggerFactory.getLogger(parser.class);
+
+    /** Report a non fatal error (or warning).
+     *
+     * @param message an error message.
+     * @param info    an extra object reserved for use by specialized subclasses.
+     */
+    public void report_error(String message, Object info)
+    {
+        String error = "";
+        if (!(info instanceof Symbol))
+            info = cur_token;
+        if(info instanceof Symbol) {
+            int line = ((Symbol)info).left;
+            int column = ((Symbol)info).right;
+            error = line  + ":" + column;
+        }
+        error += ": " + message;
+        LOGGER.error(error);
+    }
+
+    /** Report a fatal error.
+     *
+     * @param message an error message.
+     * @param info    an extra object reserved for use by specialized subclasses.
+     */
+    public void report_fatal_error(String   message, Object   info) throws java.lang.Exception
+    {
+        /* stop parsing (not really necessary since we throw an exception, but) */
+        done_parsing();
+
+        /* use the normal error message reporting to put out the message */
+        report_error(message, info);
+
+        /* throw an exception */
+        throw new Exception("Can't recover from previous error(s)");
+    }
+
+    public int getLine() {
+        Symbol symbol = (Symbol) cur_token;
+        return symbol.left;
+    }
+
+    public int getColumn() {
+        Symbol symbol = (Symbol) cur_token;
+        return symbol.right;
+    }
+:};
+
+terminal AND, OR, NOT;
+terminal CHAR, INT;
+terminal DO, WHILE;
+terminal FUN;
+terminal IF, ELSE, THEN;
+terminal NOTHING;
+terminal REF;
+terminal RETURN;
+terminal VAR;
+terminal java.lang.String IDENTIFIER;       // name
+
+terminal LPAREN, RPAREN, SEMICOLON, ANO_KATO_TELEIA, LCURLY, RCURLY, LBRACKET, RBRACKET, COMMA;
+terminal EQ, NEQ, LEQ, GEQ, LTHAN, GTHAN;
+terminal SPACER;
+terminal TIMES, DIV, MOD;
+terminal PLUS, MINUS;
+terminal DIAISI;
+
+terminal java.lang.Integer    INTEGER_LITERAL;
+terminal java.lang.Double     DOUBLE_LITERAL;
+terminal java.lang.String     STRING_LITERAL;
+terminal java.lang.Character  CHAR_LITERAL;
+
+non terminal program;
+non terminal func_def;
+non terminal header;
+non terminal local_defs;
+non terminal local_def;
+non terminal block;
+non terminal fpar_defs;
+non terminal fpar_def;
+non terminal ret_type;
+non terminal ids;
+non terminal fpar_type;
+non terminal data_type;
+non terminal type;
+non terminal int_consts;
+non terminal func_decl;
+non terminal var_def;
+non terminal stmts;
+non terminal stmt;
+non terminal l_value;
+non terminal func_call;
+non terminal cond;
+non terminal exprs;
+non terminal expr;
+
+precedence left OR;
+precedence left AND;
+precedence nonassoc NOT;
+precedence nonassoc EQ, DIAISI, GTHAN, LTHAN, LEQ, GEQ, NEQ;
+precedence left PLUS, MINUS;
+precedence left TIMES, DIV, MOD;
+
+start with program;
+       
+program ::= func_def ;
+
+func_def ::= header local_defs block ;
+
+header ::= FUN IDENTIFIER LPAREN fpar_defs RPAREN ANO_KATO_TELEIA ret_type ;
+
+fpar_defs ::= fpar_def ANO_KATO_TELEIA fpar_defs
+          | fpar_def
+          |
+          ;
+
+fpar_def ::= REF ids ANO_KATO_TELEIA fpar_type
+         |  ids ANO_KATO_TELEIA fpar_type    
+         ;
+
+ids      ::= IDENTIFIER COMMA ids
+         | IDENTIFIER
+         ;
+
+data_type ::= INT
+          | CHAR
+          ;
+
+type ::= data_type int_consts ; 
+
+int_consts ::= int_consts LBRACKET INTEGER_LITERAL RBRACKET
+           | 
+           ;
+
+ret_type ::= data_type
+         | NOTHING
+         ;
+
+fpar_type ::= data_type LBRACKET RBRACKET int_consts
+          | data_type int_consts
+          ;
+
+local_defs ::= local_defs local_def
+           | 
+           ;
+
+local_def ::= func_def
+          | func_decl
+          | var_def
+          ;
+
+func_decl ::= header SEMICOLON
+          ;
+
+var_def ::= VAR ids ANO_KATO_TELEIA type SEMICOLON
+        ;
+
+stmts ::= stmts stmt
+      |
+      ;
+
+l_value ::= IDENTIFIER
+        | STRING_LITERAL
+        | l_value LBRACKET expr RBRACKET
+        ;
+
+stmt ::= SEMICOLON
+     | l_value SPACER expr SEMICOLON
+     | block
+     | func_call SEMICOLON
+     | IF cond THEN stmt
+     | IF cond THEN stmt ELSE stmt
+     | WHILE cond DO stmt
+     | RETURN expr SEMICOLON
+     | RETURN SEMICOLON
+     ;
+
+block ::= LCURLY stmts RCURLY ;
+
+func_call ::= IDENTIFIER LPAREN RPAREN
+          | IDENTIFIER LPAREN exprs RPAREN
+          ; 
+
+exprs    ::= expr COMMA exprs
+         | expr
+         ;
+
+expr ::= INTEGER_LITERAL
+     | CHAR_LITERAL
+     | l_value
+     | func_call
+     |LPAREN expr RPAREN
+     | PLUS expr
+     | MINUS expr
+     | expr PLUS expr
+     | expr MINUS expr
+     | expr TIMES expr
+     | expr DIV expr
+     | expr MOD expr
+     ;
+
+cond ::= LPAREN cond RPAREN
+     | NOT cond
+     | cond AND cond
+     | cond OR cond
+     | expr EQ expr
+     | expr DIAISI expr
+     | expr LTHAN expr
+     | expr GTHAN expr
+     | expr LEQ expr
+     | expr GEQ expr
+     ;
