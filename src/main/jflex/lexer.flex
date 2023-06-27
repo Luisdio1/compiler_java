@@ -35,7 +35,8 @@ import java_cup.runtime.Symbol;
 
 LineTerminator = \r|\n|\r\n
 WhiteSpace     = {LineTerminator} | [ \t\f] 
-Comment        = "/*" [^*] ~"*/" | "/*" "*"+ "/"
+Comment        = "\\\$" [^$] ~"\\\$" | "\\\$" "\\"+ "$"
+SingleComment  = "\\\$" [^$] {LineTerminator}?
 
 Identifier     = [:jletter:] [:jletterdigit:]*
 IntegerLiteral = 0 | [1-9][0-9]*
@@ -77,9 +78,7 @@ CharLiteral    = \'(\\.|[^\n'\\])\'?
 
     /* identifiers */ 
     {Identifier}                   { return createSymbol(sym.IDENTIFIER, yytext()); }
-
     {IntegerLiteral}               { return createSymbol(sym.INTEGER_LITERAL, Integer.valueOf(yytext())); }
-    {FloatLiteral}                 { return createSymbol(sym.DOUBLE_LITERAL, Double.valueOf(yytext())); }
 
     \"                             { sb.setLength(0); yybegin(STRING); }
     \\\$\\\$                       { yybegin(COMMENT); }
@@ -94,16 +93,15 @@ CharLiteral    = \'(\\.|[^\n'\\])\'?
     ")"                            { return createSymbol(sym.RPAREN); }
     ";"                            { return createSymbol(sym.SEMICOLON); }
    
-    ":"                            { return createSymbol(sym.ANO_KATO_TELEIA); }
+    ":"                            { return createSymbol(sym.COLON); }
     "{"                            { return createSymbol(sym.LCURLY); }
     "}"                            { return createSymbol(sym.RCURLY); }
     "["                            { return createSymbol(sym.LBRACKET); }
     "]"                            { return createSymbol(sym.RBRACKET); }
     "<-"                           { return createSymbol(sym.SPACER); }
-    "<>"                           { return createSymbol(sym.NEQ); }
     "<="                           { return createSymbol(sym.LEQ); }
     ">="                           { return createSymbol(sym.GEQ); }
-    "#"                            { return createSymbol(sym.DIAISI); }
+    "#"                            { return createSymbol(sym.NEQ); }
     "<"                            { return createSymbol(sym.LTHAN); }
     ">"                            { return createSymbol(sym.GTHAN); }
     ","                            { return createSymbol(sym.COMMA); }
@@ -128,12 +126,12 @@ CharLiteral    = \'(\\.|[^\n'\\])\'?
 }
 
 <COMMENT> {
-    \\\$\\\$                       { yybegin(YYINITIAL); }
+    {Comment}                      { /* ignore */ }
 
 }
 
 <SINGLE_COMMENT> {
-    \n                             { yybegin(YYINITIAL); }
+    {SingleComment}                { /* ignore */ }
 
 }
 

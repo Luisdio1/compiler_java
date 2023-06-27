@@ -69,15 +69,13 @@ terminal RETURN;
 terminal VAR;
 terminal java.lang.String IDENTIFIER;       // name
 
-terminal LPAREN, RPAREN, SEMICOLON, ANO_KATO_TELEIA, LCURLY, RCURLY, LBRACKET, RBRACKET, COMMA;
+terminal LPAREN, RPAREN, SEMICOLON, COLON, LCURLY, RCURLY, LBRACKET, RBRACKET, COMMA;
 terminal EQ, NEQ, LEQ, GEQ, LTHAN, GTHAN;
 terminal SPACER;
 terminal TIMES, DIV, MOD;
 terminal PLUS, MINUS;
-terminal DIAISI;
 
 terminal java.lang.Integer    INTEGER_LITERAL;
-terminal java.lang.Double     DOUBLE_LITERAL;
 terminal java.lang.String     STRING_LITERAL;
 terminal java.lang.Character  CHAR_LITERAL;
 
@@ -104,11 +102,13 @@ non terminal func_call;
 non terminal cond;
 non terminal exprs;
 non terminal expr;
+non terminal else_opt;
+non terminal expr_opt;
 
 precedence left OR;
 precedence left AND;
 precedence nonassoc NOT;
-precedence nonassoc EQ, DIAISI, GTHAN, LTHAN, LEQ, GEQ, NEQ;
+precedence nonassoc EQ, GTHAN, LTHAN, LEQ, GEQ, NEQ;
 precedence left PLUS, MINUS;
 precedence left TIMES, DIV, MOD;
 
@@ -118,106 +118,111 @@ program ::= func_def ;
 
 func_def ::= header local_defs block ;
 
-header ::= FUN IDENTIFIER LPAREN fpar_defs RPAREN ANO_KATO_TELEIA ret_type ;
+header ::= FUN IDENTIFIER LPAREN fpar_defs RPAREN COLON ret_type ;
 
-fpar_defs ::= fpar_def ANO_KATO_TELEIA fpar_defs
-          | fpar_def
-          |
-          ;
+fpar_defs ::= fpar_def SEMICOLON fpar_defs
+            | fpar_def
+            |
+            ;
 
-fpar_def ::= REF ids ANO_KATO_TELEIA fpar_type
-         |  ids ANO_KATO_TELEIA fpar_type    
-         ;
+fpar_def ::= REF ids COLON fpar_type
+           | ids COLON fpar_type    
+           ;
 
 ids      ::= IDENTIFIER COMMA ids
-         | IDENTIFIER
-         ;
+           | IDENTIFIER
+           ;
 
 data_type ::= INT
-          | CHAR
-          ;
+            | CHAR
+            ;
 
 type ::= data_type int_consts ; 
 
 int_consts ::= int_consts LBRACKET INTEGER_LITERAL RBRACKET
-           | 
-           ;
+             | 
+             ;
 
 ret_type ::= data_type
-         | NOTHING
-         ;
-
-fpar_type ::= data_type LBRACKET RBRACKET int_consts
-          | data_type int_consts
-          ;
-
-local_defs ::= local_defs local_def
-           | 
+           | NOTHING
            ;
 
+fpar_type ::= data_type LBRACKET RBRACKET int_consts
+            | data_type int_consts
+            ;
+
+local_defs ::= local_defs local_def
+             | 
+             ;
+
 local_def ::= func_def
-          | func_decl
-          | var_def
-          ;
+            | func_decl
+            | var_def
+            ;
 
-func_decl ::= header SEMICOLON
-          ;
+func_decl ::= header SEMICOLON ;
 
-var_def ::= VAR ids ANO_KATO_TELEIA type SEMICOLON
-        ;
+var_def ::= VAR ids COLON type SEMICOLON ;
 
 stmts ::= stmts stmt
-      |
-      ;
-
-l_value ::= IDENTIFIER
-        | STRING_LITERAL
-        | l_value LBRACKET expr RBRACKET
+        |
         ;
 
+l_value ::= IDENTIFIER
+          | STRING_LITERAL
+          | l_value LBRACKET expr RBRACKET
+          ;
+
 stmt ::= SEMICOLON
-     | l_value SPACER expr SEMICOLON
-     | block
-     | func_call SEMICOLON
-     | IF cond THEN stmt
-     | IF cond THEN stmt ELSE stmt
-     | WHILE cond DO stmt
-     | RETURN expr SEMICOLON
-     | RETURN SEMICOLON
-     ;
+       | l_value SPACER expr SEMICOLON
+       | block
+       | func_call SEMICOLON
+       | IF cond THEN stmt else_opt
+       | WHILE cond DO stmt
+       | RETURN expr_opt SEMICOLON
+       ;
+
+else_opt ::= 
+           | ELSE stmt
+           ;
+
+expr_opt ::=    
+           | expr
+           ;
+
 
 block ::= LCURLY stmts RCURLY ;
 
 func_call ::= IDENTIFIER LPAREN RPAREN
-          | IDENTIFIER LPAREN exprs RPAREN
-          ; 
+            | IDENTIFIER LPAREN exprs RPAREN
+            ; 
 
-exprs    ::= expr COMMA exprs
-         | expr
-         ;
+exprs ::= expr COMMA exprs
+        | expr
+        ;
 
 expr ::= INTEGER_LITERAL
-     | CHAR_LITERAL
-     | l_value
-     | func_call
-     |LPAREN expr RPAREN
-     | PLUS expr
-     | MINUS expr
-     | expr PLUS expr
-     | expr MINUS expr
-     | expr TIMES expr
-     | expr DIV expr
-     | expr MOD expr
-     ;
+       | CHAR_LITERAL
+       | l_value
+       | func_call
+       | LPAREN expr RPAREN
+       | PLUS expr
+       | MINUS expr
+       | expr PLUS expr
+       | expr MINUS expr
+       | expr TIMES expr
+       | expr DIV expr
+       | expr MOD expr
+       ;
 
 cond ::= LPAREN cond RPAREN
-     | NOT cond
-     | cond AND cond
-     | cond OR cond
-     | expr EQ expr
-     | expr DIAISI expr
-     | expr LTHAN expr
-     | expr GTHAN expr
-     | expr LEQ expr
-     | expr GEQ expr
-     ;
+       | NOT cond
+       | cond AND cond
+       | cond OR cond
+       | expr EQ expr
+       | expr NEQ expr
+       | expr LTHAN expr
+       | expr GTHAN expr
+       | expr LEQ expr
+       | expr GEQ expr
+       ;
