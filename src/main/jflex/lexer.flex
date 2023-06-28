@@ -41,12 +41,12 @@ SingleComment  = "\\\$" [^$] {LineTerminator}?
 Identifier     = [:jletter:] [:jletterdigit:]*
 IntegerLiteral = 0 | [1-9][0-9]*
 
-Exponent       = [eE][\+\-]?[0-9]+
-Float1         = [0-9]+ \. [0-9]+ {Exponent}?
-Float2         = \. [0-9]+ {Exponent}?
-Float3         = [0-9]+ \. {Exponent}?
-Float4         = [0-9]+ {Exponent}
-FloatLiteral   = {Float1} | {Float2} | {Float3} | {Float4}
+// Exponent       = [eE][\+\-]?[0-9]+
+// Float1         = [0-9]+ \. [0-9]+ {Exponent}?
+// Float2         = \. [0-9]+ {Exponent}?
+// Float3         = [0-9]+ \. {Exponent}?
+// Float4         = [0-9]+ {Exponent}
+// FloatLiteral   = {Float1} | {Float2} | {Float3} | {Float4}
 
 CharLiteral    = \'(\\.|[^\n'\\])\'? 
 
@@ -59,6 +59,7 @@ CharLiteral    = \'(\\.|[^\n'\\])\'?
 <YYINITIAL> {
     /* reserved keywords */
     "and"                          { return createSymbol(sym.AND); }
+    "puts"                         { return createSymbol(sym.PUTS); }
     "char"                         { return createSymbol(sym.CHAR); }
     "div"                          { return createSymbol(sym.DIV); }
     "do"                           { return createSymbol(sym.DO); }

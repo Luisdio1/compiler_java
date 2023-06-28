@@ -1,11 +1,10 @@
-/**
- *  This code is part of the lab exercises for the Compilers course
- *  at Harokopio University of Athens, Dept. of Informatics and Telematics.
- */
-
 import java_cup.runtime.Symbol;
+import java.util.List;
+import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ast.*;
 
 parser code
 {:
@@ -59,6 +58,7 @@ parser code
 :};
 
 terminal AND, OR, NOT;
+terminal PUTS;
 terminal CHAR, INT;
 terminal DO, WHILE;
 terminal FUN;
@@ -79,7 +79,7 @@ terminal java.lang.Integer    INTEGER_LITERAL;
 terminal java.lang.String     STRING_LITERAL;
 terminal java.lang.Character  CHAR_LITERAL;
 
-non terminal program;
+non terminal Program program;
 non terminal func_def;
 non terminal header;
 non terminal local_defs;
@@ -95,13 +95,12 @@ non terminal type;
 non terminal int_consts;
 non terminal func_decl;
 non terminal var_def;
-non terminal stmts;
-non terminal stmt;
-non terminal l_value;
+non terminal List<Statement> stmts;
+non terminal Statement stmt;
 non terminal func_call;
-non terminal cond;
-non terminal exprs;
-non terminal expr;
+non terminal Condition cond;
+non terminal List<Expression> exprs;
+non terminal Expression expr;
 
 precedence left OR;
 precedence left AND;
@@ -114,8 +113,18 @@ precedence left ELSE;
 
 start with program;
        
-program ::= 
-          | func_def 
+program ::= /* empty */
+          {:
+            RESULT = new Program();
+            RESULT.setLine(1);
+            RESULT.setColumn(1);
+          :}
+          | func_def:fd
+          {:
+            RESULT = new Program(fd);
+            RESULT.setLine(fdleft);
+            RESULT.setColumn(fdright);
+          :} 
           ;
 
 func_def ::= header local_defs block 
@@ -168,17 +177,27 @@ func_decl ::= header SEMICOLON ;
 
 var_def ::= VAR ids COLON type SEMICOLON ;
 
-stmts ::= stmt
-        | stmts stmt
+stmts ::= stmt:s
+        {:
+          RESULT = new ArrayList<Statement>();
+          RESULT.add(s);
+        :}
+        | stmts:sl stmt:s
+        {:
+          sl.add(s);
+          RESULT = sl;
+        :}
         ;
 
-l_value ::= IDENTIFIER
-          | STRING_LITERAL
-          | l_value LBRACKET expr RBRACKET
-          ;
-
 stmt ::= SEMICOLON
-       | l_value SPACER expr SEMICOLON
+       | PUTS:p LPAREN expr:e RPAREN SEMICOLON
+         {:
+         RESULT = new PutsStatement(e);
+         RESULT.setLine(pleft);
+         RESULT.setColumn(pright);
+         :}
+       | IDENTIFIER SPACER expr SEMICOLON
+       | STRING_LITERAL SPACER expr SEMICOLON
        | block
        | func_call SEMICOLON
        | IF cond THEN stmt 
@@ -198,28 +217,141 @@ exprs ::= expr COMMA exprs
         | expr
         ;
 
-expr ::= INTEGER_LITERAL
-       | CHAR_LITERAL
-       | l_value
+expr ::= INTEGER_LITERAL:l
+         {:
+             RESULT = new IntegerLiteralExpression(l);
+             RESULT.setLine(lleft);
+             RESULT.setColumn(lright);
+         :}
+       | CHAR_LITERAL:c
+         {:
+             RESULT = new CharLiteralExpression(c);
+             RESULT.setLine(cleft);
+             RESULT.setColumn(cright);
+         :}
+       | IDENTIFIER:i
+           {:
+             RESULT = new IdentifierExpression(i);
+             RESULT.setLine(ileft);
+             RESULT.setColumn(iright);
+           :}
+       | STRING_LITERAL:s
+           {:
+             RESULT = new StringLiteralExpression(s);
+             RESULT.setLine(sleft);
+             RESULT.setColumn(sright);
+           :}
+       | IDENTIFIER LBRACKET expr RBRACKET
+       | STRING_LITERAL LBRACKET expr RBRACKET
        | func_call
-       | LPAREN expr RPAREN
-       | PLUS expr
-       | MINUS expr
-       | expr PLUS expr
-       | expr MINUS expr
-       | expr TIMES expr
-       | expr DIV expr
-       | expr MOD expr
+       | LPAREN:lp expr:e RPAREN
+         {:
+             RESULT = new ParenthesisExpression(e);
+             RESULT.setLine(lpleft);
+             RESULT.setColumn(lpright);
+         :}
+       | PLUS:p expr:e
+         {:
+             RESULT = new UnaryExpression(Operator.PLUS, e);
+             RESULT.setLine(pleft);
+             RESULT.setColumn(pright);
+         :}
+       | MINUS:m expr:e
+         {:
+             RESULT = new UnaryExpression(Operator.MINUS, e);
+             RESULT.setLine(mleft);
+             RESULT.setColumn(mright);
+         :}
+       | expr:e1 PLUS expr:e2
+         {:
+             RESULT = new BinaryExpression(Operator.PLUS, e1, e2);
+             RESULT.setLine(e1left);
+             RESULT.setColumn(e1right);
+         :}
+       | expr:e1 MINUS expr:e2
+         {:
+             RESULT = new BinaryExpression(Operator.MINUS, e1, e2);
+             RESULT.setLine(e1left);
+             RESULT.setColumn(e1right);
+         :}
+       | expr:e1 TIMES expr:e2
+         {:
+             RESULT = new BinaryExpression(Operator.TIMES, e1, e2);
+             RESULT.setLine(e1left);
+             RESULT.setColumn(e1right);
+         :}
+       | expr:e1 DIV expr:e2
+         {:
+             RESULT = new BinaryExpression(Operator.DIV, e1, e2);
+             RESULT.setLine(e1left);
+             RESULT.setColumn(e1right);
+         :}
+       | expr:e1 MOD expr:e2
+         {:
+             RESULT = new BinaryExpression(Operator.MOD, e1, e2);
+             RESULT.setLine(e1left);
+             RESULT.setColumn(e1right);
+         :}
+       | expr:e1 EQ expr:e2
+         {:
+             RESULT = new BinaryExpression(Operator.EQ, e1, e2);
+             RESULT.setLine(e1left);
+             RESULT.setColumn(e1right);
+         :}
+       | expr:e1 NEQ expr:e2
+         {:
+             RESULT = new BinaryExpression(Operator.NEQ, e1, e2);
+             RESULT.setLine(e1left);
+             RESULT.setColumn(e1right);
+         :}
+       | expr:e1 LTHAN expr:e2
+         {:
+             RESULT = new BinaryExpression(Operator.LTHAN, e1, e2);
+             RESULT.setLine(e1left);
+             RESULT.setColumn(e1right);
+         :}
+       | expr:e1 GTHAN expr:e2
+         {:
+             RESULT = new BinaryExpression(Operator.GTHAN, e1, e2);
+             RESULT.setLine(e1left);
+             RESULT.setColumn(e1right);
+         :}
+       | expr:e1 LEQ expr:e2
+         {:
+             RESULT = new BinaryExpression(Operator.LEQ, e1, e2);
+             RESULT.setLine(e1left);
+             RESULT.setColumn(e1right);
+         :}
+       | expr:e1 GEQ expr:e2
+         {:
+             RESULT = new BinaryExpression(Operator.GEQ, e1, e2);
+             RESULT.setLine(e1left);
+             RESULT.setColumn(e1right);
+         :}
        ;
 
-cond ::= LPAREN cond RPAREN
-       | NOT cond
-       | cond AND cond
-       | cond OR cond
-       | expr EQ expr
-       | expr NEQ expr
-       | expr LTHAN expr
-       | expr GTHAN expr
-       | expr LEQ expr
-       | expr GEQ expr
+cond ::= LPAREN:lp cond:c RPAREN
+         {:
+             RESULT = new ParenthesisCondition(c);
+             RESULT.setLine(lpleft);
+             RESULT.setColumn(lpright);
+         :}
+       | NOT:n cond:c
+         {:
+             RESULT = new UnaryCondition(Operator.NOT, c);
+             RESULT.setLine(nleft);
+             RESULT.setColumn(nright);
+         :}
+       | cond:c1 AND cond:c2
+         {:
+             RESULT = new BinaryCondition(Operator.AND, c1, c2);
+             RESULT.setLine(c1left);
+             RESULT.setColumn(c1right);
+         :}
+       | cond:c1 OR cond:c2
+         {:
+             RESULT = new BinaryCondition(Operator.OR, c1, c2);
+             RESULT.setLine(c1left);
+             RESULT.setColumn(c1right);
+         :}
        ;
