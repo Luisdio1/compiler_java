@@ -102,7 +102,6 @@ non terminal func_call;
 non terminal cond;
 non terminal exprs;
 non terminal expr;
-non terminal expr_opt;
 
 precedence left OR;
 precedence left AND;
@@ -110,7 +109,8 @@ precedence nonassoc NOT;
 precedence nonassoc EQ, GTHAN, LTHAN, LEQ, GEQ, NEQ;
 precedence left PLUS, MINUS;
 precedence left TIMES, DIV, MOD;
-precedence left THEN, ELSE;
+precedence left THEN;
+precedence left ELSE;
 
 start with program;
        
@@ -184,13 +184,9 @@ stmt ::= SEMICOLON
        | IF cond THEN stmt 
        | IF cond THEN stmt ELSE stmt
        | WHILE cond DO stmt
-       | RETURN expr_opt SEMICOLON
+       | RETURN expr SEMICOLON
+       | RETURN SEMICOLON
        ;
-
-expr_opt ::=    
-           | expr
-           ;
-
 
 block ::= LCURLY stmts RCURLY ;
 
