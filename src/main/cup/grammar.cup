@@ -102,7 +102,6 @@ non terminal func_call;
 non terminal cond;
 non terminal exprs;
 non terminal expr;
-non terminal else_opt;
 non terminal expr_opt;
 
 precedence left OR;
@@ -111,12 +110,17 @@ precedence nonassoc NOT;
 precedence nonassoc EQ, GTHAN, LTHAN, LEQ, GEQ, NEQ;
 precedence left PLUS, MINUS;
 precedence left TIMES, DIV, MOD;
+precedence left THEN, ELSE;
 
 start with program;
        
-program ::= func_def ;
+program ::= 
+          | func_def 
+          ;
 
-func_def ::= header local_defs block ;
+func_def ::= header local_defs block 
+           | header block
+           ;
 
 header ::= FUN IDENTIFIER LPAREN fpar_defs RPAREN COLON ret_type ;
 
@@ -139,8 +143,8 @@ data_type ::= INT
 
 type ::= data_type int_consts ; 
 
-int_consts ::= int_consts LBRACKET INTEGER_LITERAL RBRACKET
-             | 
+int_consts ::= 
+             | LBRACKET INTEGER_LITERAL RBRACKET int_consts
              ;
 
 ret_type ::= data_type
@@ -151,8 +155,8 @@ fpar_type ::= data_type LBRACKET RBRACKET int_consts
             | data_type int_consts
             ;
 
-local_defs ::= local_defs local_def
-             | 
+local_defs ::= local_def
+             | local_defs local_def
              ;
 
 local_def ::= func_def
@@ -164,8 +168,8 @@ func_decl ::= header SEMICOLON ;
 
 var_def ::= VAR ids COLON type SEMICOLON ;
 
-stmts ::= stmts stmt
-        |
+stmts ::= stmt
+        | stmts stmt
         ;
 
 l_value ::= IDENTIFIER
@@ -177,14 +181,11 @@ stmt ::= SEMICOLON
        | l_value SPACER expr SEMICOLON
        | block
        | func_call SEMICOLON
-       | IF cond THEN stmt else_opt
+       | IF cond THEN stmt 
+       | IF cond THEN stmt ELSE stmt
        | WHILE cond DO stmt
        | RETURN expr_opt SEMICOLON
        ;
-
-else_opt ::= 
-           | ELSE stmt
-           ;
 
 expr_opt ::=    
            | expr
