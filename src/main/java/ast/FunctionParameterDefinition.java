@@ -5,12 +5,14 @@ import java.util.List;
 public class FunctionParameterDefinition extends Definition {
     
     private Type type;
-    private List<String> identifier;
+    private String identifier;
+    private List<String> identifiers;
     private boolean ref;
     
-    public FunctionParameterDefinition(Type type, List<String> identifier, boolean ref) {
+    public FunctionParameterDefinition(Type type, String identifier, List<String> identifiers, boolean ref) {
         this.type = type;
         this.identifier = identifier;
+        this.identifiers = identifiers;
         this.ref = ref;
     }
     
@@ -21,13 +23,21 @@ public class FunctionParameterDefinition extends Definition {
     public void setType(Type type) {
         this.type = type;
     }
-    
-    public List<String> getIdentifier() {
+
+    public String getIdentifier() {
         return identifier;
     }
 
-    public void setIdentifier(List<String> identifer) {
-        this.identifier = identifer;
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+    }
+    
+    public List<String> getIdentifiers() {
+        return identifiers;
+    }
+
+    public void setIdentifiers(List<String> identifiers) {
+        this.identifiers = identifiers;
     }
 
     public boolean getRef() {

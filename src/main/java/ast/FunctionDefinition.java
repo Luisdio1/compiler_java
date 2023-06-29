@@ -4,60 +4,41 @@ import java.util.List;
 
 public class FunctionDefinition extends Definition {
     
-    private Type type;
-    private String identifier;
-    private List<Definition> parameterList;
-    private List<Definition> definitionList;
-    private List<Statement> statementList;
-    
-    public FunctionDefinition( Type type, String identifier, List<Definition> parameterList, List<Definition> definitionList, List<Statement> statementList) {
-        this.identifier = identifier;
-        this.parameterList = parameterList;
-        this.type = type;
-        this.statementList = statementList;
-        this.definitionList = definitionList;
-    }
-    
-    public Type getType() {
-        return type;
+    private Definition header;
+    private List<Definition> definitions;
+    private Statement block;
+
+    public FunctionDefinition(Definition header, List<Definition> definitions, Statement block) {
+        this.header = header;
+        this.definitions = definitions;
+        this.block = block;
     }
 
-    public void setType(Type type) {
-        this.type = type;
-    }
-    
-    public String getIdentifier() {
-        return identifier;
+    public Definition getHeader() {
+        return header;
     }
 
-    public void setIdentifier(String identifer) {
-        this.identifier = identifer;
-    }
-    
-    public List<Definition> getParameterList() {
-        return parameterList;
+    public void setHeader(Definition header) {
+        this.header = header;
     }
 
-    public void setParameterList(List<Definition> parameterList) {
-        this.parameterList = parameterList;
-    }
-    
-    public List<Statement> getStatementList() {
-        return statementList;
+    public List<Definition> getDefinitions() {
+        return definitions;
     }
 
-    public void setStatementList(List<Statement> statementList) {
-        this.statementList = statementList;
+    public void setDefinitions(List<Definition> definitions) {
+        this.definitions = definitions;
     }
 
-    public List<Definition> getDefinitionList() {
-        return definitionList;
+    public Statement getBlock() {
+        return block;
     }
 
-    public void setDefinitionList(List<Definition> definitionList) {
-        this.definitionList = definitionList;
+    public void setBlock(Statement block) {
+        this.block = block;
     }
-    
+
+    @Override
     public void accept(ASTVisitor visitor) throws ASTVisitorException {
         visitor.visit(this);
     }

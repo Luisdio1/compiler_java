@@ -82,24 +82,26 @@ terminal java.lang.Character  CHAR_LITERAL;
 
 non terminal Program program;
 non terminal Definition func_def;
-non terminal List<Definition> local_defs;
-non terminal Definition local_def;
-non terminal List<Definition> fpar_defs;
+non terminal Definition header;
 non terminal Definition fpar_def;
-non terminal Type ret_type;
-non terminal List<String> ids;
-non terminal Type fpar_type;
+non terminal List<Definition> fpar_defs;
 non terminal Type data_type;
-non terminal Type type;
-non terminal int_consts;
-non terminal Definition func_decl;
+non terminal Type ret_type;
+non terminal Type fpar_type;
+non terminal Definition local_def;
+non terminal List<Definition> local_defs;
 non terminal Definition var_def;
-non terminal List<Statement> stmts;
+non terminal Definition func_decl;
 non terminal Statement stmt;
-non terminal func_call;
-non terminal Condition cond;
-non terminal List<Expression> exprs;
+non terminal List<Statement> stmts;
+non terminal Statement block;
+non terminal Statement func_call;
+non terminal Expression l_value;
+non terminal List<String> ids;
+non terminal List<Integer> arrays;
 non terminal Expression expr;
+non terminal List<Expression> exprs;
+non terminal Condition cond;
 
 precedence left OR;
 precedence left AND;
@@ -111,14 +113,8 @@ precedence left THEN;
 precedence left ELSE;
 
 start with program;
-       
-program ::= /* empty */
-          {:
-            RESULT = new Program();
-            RESULT.setLine(1);
-            RESULT.setColumn(1);
-          :}
-          | func_def:fd
+      
+program ::= func_def:fd
           {:
             RESULT = new Program(fd);
             RESULT.setLine(fdleft);
@@ -126,81 +122,65 @@ program ::= /* empty */
           :} 
           ;
 
-func_def ::= FUN:f IDENTIFIER:i LPAREN:lp fpar_defs:fds RPAREN COLON ret_type:rt local_defs:lds LCURLY stmts:ss RCURLY 
-            {:
-                RESULT = new FunctionDefinition(rt, i, fds, lds, ss);
-                RESULT.setLine(fleft);
-                RESULT.setColumn(fright);
-            :}
-           | FUN:f IDENTIFIER:i LPAREN:lp fpar_defs:fds RPAREN COLON ret_type:rt LCURLY stmts:ss RCURLY
-            {:
-                RESULT = new FunctionDefinition(rt, i, fds, new ArrayList<Definition>(), ss);
-                RESULT.setLine(fleft);
-                RESULT.setColumn(fright);
-            :}
-           ;
+func_def ::= header:h local_defs:ls block:b
+          {:
+            RESULT = new FunctionDefinition(h, ls, b);
+            RESULT.setLine(hleft);
+            RESULT.setColumn(hright);
+          :}
+          ;
 
-fpar_defs ::= fpar_def:f SEMICOLON fpar_defs:fs
+header ::= FUN:f IDENTIFIER:i LPAREN:lp fpar_def:fd fpar_defs:fds RPAREN COLON ret_type:rt
+          {:
+            RESULT = new HeaderDefinition(rt, i, fd, fds);
+            RESULT.setLine(fleft);
+            RESULT.setColumn(fright);
+          :}
+          ;
+
+fpar_defs ::= /* empty */
             {:
-              fs.add(f);
+              RESULT = new ArrayList<Definition>();
+            :}
+            | SEMICOLON fpar_def:fd fpar_defs:fs
+            {:
+              fs.add(fd);
               RESULT = fs;
-            :}
-            | fpar_def:f
-            {:
-              RESULT = new ArrayList<Definition>();
-              RESULT.add(f);
-            :}
-            | /* empty */
-            {:
-              RESULT = new ArrayList<Definition>();
             :}
             ;
 
-fpar_def ::= REF:r ids:i COLON fpar_type:ft
+fpar_def ::= /* empty */
             {:
-              RESULT = new FunctionParameterDefinition(ft, i, true);
+                RESULT = null;
+            :}
+           | REF:r IDENTIFIER:i ids:is COLON fpar_type:ft
+            {:
+              RESULT = new FunctionParameterDefinition(ft, i, is, true);
               RESULT.setLine(rleft);
               RESULT.setColumn(rright);
             :}
-           | ids:i COLON fpar_type:ft   
+           | IDENTIFIER:i ids:is COLON fpar_type:ft   
             {:
-              RESULT = new FunctionParameterDefinition(ft, i, false);
-              RESULT.setLine(ftleft);
-              RESULT.setColumn(ftright);
+              RESULT = new FunctionParameterDefinition(ft, i, is, false);
+              RESULT.setLine(ileft);
+              RESULT.setColumn(iright);
             :}
            ;
 
-ids      ::= IDENTIFIER:i COMMA ids:is
+ids      ::= /* empty */
+            {:
+                 RESULT = new ArrayList<String>();
+            :}
+           | COMMA IDENTIFIER:i ids:is
               {:
                  is.add(i);
                  RESULT = is;
               :}
-           | IDENTIFIER:i
-              {:
-                 RESULT = new ArrayList<String>();
-                 RESULT.add(i);
-              :}
            ;
 
-data_type ::= INT:i
+ret_type ::= data_type:dt 
             {:
-              RESULT = Type.INT;
-            :}
-            | CHAR:c
-            {:
-              RESULT = Type.CHAR;
-            :}
-            ;
-
-type ::= data_type int_consts ; 
-
-int_consts ::= 
-             | LBRACKET INTEGER_LITERAL RBRACKET int_consts
-             ;
-
-ret_type ::= data_type:d
-            {:
-              RESULT = d;
+                RESULT = dt;
             :}
            | NOTHING:n
             {:
@@ -208,21 +188,15 @@ ret_type ::= data_type:d
             :}
            ;
 
-fpar_type ::= data_type LBRACKET RBRACKET int_consts
-            | data_type int_consts
+fpar_type ::= data_type:dt LBRACKET RBRACKET arrays:as 
+            {:
+                RESULT = dt;
+            :}
+            | data_type:dt arrays:as
+            {:
+                RESULT = dt;
+            :}
             ;
-
-local_defs ::= local_def:l
-                {:
-                RESULT = new ArrayList<Definition>();
-                RESULT.add(l);
-                :}
-             | local_defs:ls local_def:l
-                {:
-                ls.add(l);
-                RESULT = ls;
-                :}
-             ;
 
 local_def ::= func_def:fd
             {:
@@ -238,64 +212,163 @@ local_def ::= func_def:fd
             :}
             ;
 
-func_decl ::= FUN:f IDENTIFIER:i LPAREN:lp fpar_defs:fds RPAREN COLON ret_type:rt local_defs:lds SEMICOLON 
+local_defs ::= /* empty */
             {:
-                RESULT = new FunctionDeclaration(rt, i, fds, lds);
-                RESULT.setLine(fleft);
-                RESULT.setColumn(fright);
+              RESULT = new ArrayList<Definition>();
             :}
-            | FUN:f IDENTIFIER:i LPAREN:lp fpar_defs:fds RPAREN COLON ret_type:rt SEMICOLON
+            | local_def:ld local_defs:lds
             {:
-                RESULT = new FunctionDeclaration(rt, i, fds, new ArrayList<Definition>());
-                RESULT.setLine(fleft);
-                RESULT.setColumn(fright);
+              lds.add(ld);
+              RESULT = lds;
             :}
             ;
 
-var_def ::= VAR ids COLON type SEMICOLON ;
+var_def ::= VAR:v IDENTIFIER:i ids:is COLON data_type:dt arrays:as SEMICOLON 
+          {:
+            RESULT = new VariableDefinition(i, is, dt, as);
+            RESULT.setLine(vleft);
+            RESULT.setColumn(vright);
+          :}
+          ;
 
-stmts ::= stmt:s
-        {:
-          RESULT = new ArrayList<Statement>();
-          RESULT.add(s);
-        :}
-        | stmts:sl stmt:s
-        {:
-          sl.add(s);
-          RESULT = sl;
-        :}
-        ;
-
-stmt ::= SEMICOLON
-       | PUTS:p LPAREN expr:e RPAREN SEMICOLON
-         {:
-         RESULT = new PutsStatement(e);
-         RESULT.setLine(pleft);
-         RESULT.setColumn(pright);
-         :}
-       | IDENTIFIER SPACER expr SEMICOLON
-       | STRING_LITERAL SPACER expr SEMICOLON
-       | LCURLY stmts:ss RCURLY
-       | func_call SEMICOLON
-       | IF:i expr:e THEN stmt:s 
-       {:
-         RESULT = new IfStatement(e, s);
-         RESULT.setLine(ileft);
-         RESULT.setColumn(iright);
-       :}
-       | IF:i cond:c THEN stmt:s ELSE stmt:ss
-       | WHILE cond DO stmt
-       | RETURN expr SEMICOLON
-       | RETURN SEMICOLON
-       ;
-
-func_call ::= IDENTIFIER LPAREN RPAREN
-            | IDENTIFIER LPAREN exprs RPAREN
+data_type ::= INT:i
+            {:
+              RESULT = Type.INT;
+            :}
+            | CHAR:c
+            {:
+              RESULT = Type.CHAR;
+            :}
             ; 
 
-exprs ::= expr COMMA exprs
-        | expr
+arrays    ::= /* empty */
+            {:
+              RESULT = new ArrayList<Integer>();
+            :}
+            | LBRACKET:lb INTEGER_LITERAL:l RBRACKET arrays:as
+            {:
+              as.add(l);
+              RESULT = as;
+            :}
+            ;
+
+func_decl ::= header:h SEMICOLON 
+            {:
+                RESULT = h;
+            :}
+            ;
+
+stmt ::= SEMICOLON:s
+         {:
+            RESULT = new EmptyStatement();
+            RESULT.setLine(sleft);
+            RESULT.setColumn(sright);
+         :}
+       | l_value:lv SPACER expr:e SEMICOLON
+         {:
+            RESULT = new SpacerStatement(lv, e);
+            RESULT.setLine(lvleft);
+            RESULT.setColumn(lvright);
+         :}
+       | block:b
+         {:
+            RESULT = b;
+         :}
+       | func_call:fc SEMICOLON
+         {:
+            RESULT = fc;
+         :}
+       | PUTS:p LPAREN expr:e RPAREN SEMICOLON
+         {:
+            RESULT = new PutsStatement(e);
+            RESULT.setLine(pleft);
+            RESULT.setColumn(pright);
+         :}
+       | IF:i expr:e THEN stmt:s 
+         {:
+            RESULT = new IfStatement(e, s);
+            RESULT.setLine(ileft);
+            RESULT.setColumn(iright);
+         :}
+       | IF:i expr:e THEN stmt:s1 ELSE stmt:s2
+         {:
+            RESULT = new IfElseStatement(e, s1, s2);
+            RESULT.setLine(ileft);
+            RESULT.setColumn(iright);
+         :}
+       | WHILE:w expr:e DO stmt:s
+         {:
+            RESULT = new WhileStatement(e, s);
+            RESULT.setLine(wleft);
+            RESULT.setColumn(wright);
+         :}
+       | RETURN:r expr:e SEMICOLON
+         {:
+            RESULT = new ReturnStatement(e);
+            RESULT.setLine(rleft);
+            RESULT.setColumn(rright);
+         :}
+       | RETURN:r SEMICOLON
+         {:
+            RESULT = new ReturnStatement();
+            RESULT.setLine(rleft);
+            RESULT.setColumn(rright);
+         :}
+       ;
+
+block ::= LCURLY:lc stmts:ss RCURLY 
+        {:
+            RESULT = new BlockStatement(ss);
+        :}
         ;
+
+stmts ::= /* empty */
+        {:
+            RESULT = new ArrayList<Statement>();
+        :}
+        | stmt:s stmts:ss
+        {:
+            ss.add(s);
+            RESULT = ss;
+        :}
+        ;
+
+func_call ::= IDENTIFIER:i LPAREN:lp expr:e exprs:es RPAREN
+            {:
+                RESULT = new FunctionCallStatement(i, e, es);
+                RESULT.setLine(ileft);
+                RESULT.setColumn(iright);
+            :}
+           ;
+
+exprs ::= COMMA expr:e exprs:es
+        {:
+            es.add(e);
+            RESULT = es;
+        :}
+        | /* empty */
+        {:
+            RESULT = new ArrayList<Expression>();
+        :}
+        ;
+
+l_value ::= IDENTIFIER:i 
+          {:
+                RESULT = new IdentifierExpression(i, null);
+          :}
+          | IDENTIFIER:i LBRACKET expr:e RBRACKET
+          {:
+                RESULT = new IdentifierExpression(i, e);
+          :}
+          | STRING_LITERAL:s
+          {:
+                RESULT = new StringLiteralExpression(s, null);
+          :}
+          | STRING_LITERAL:s LBRACKET expr:e RBRACKET
+          {:
+                RESULT = new StringLiteralExpression(s, e);
+          :}
+          ;
 
 expr ::= INTEGER_LITERAL:l
          {:
@@ -309,21 +382,11 @@ expr ::= INTEGER_LITERAL:l
              RESULT.setLine(cleft);
              RESULT.setColumn(cright);
          :}
-       | IDENTIFIER:i
-           {:
-             RESULT = new IdentifierExpression(i);
-             RESULT.setLine(ileft);
-             RESULT.setColumn(iright);
-           :}
-       | STRING_LITERAL:s
-           {:
-             RESULT = new StringLiteralExpression(s);
-             RESULT.setLine(sleft);
-             RESULT.setColumn(sright);
-           :}
-       | IDENTIFIER LBRACKET expr RBRACKET
-       | STRING_LITERAL LBRACKET expr RBRACKET
-       | func_call
+       | l_value:lv
+         {:
+                RESULT = lv;
+         :}
+       | func_call:fc
        | LPAREN:lp expr:e RPAREN
          {:
              RESULT = new ParenthesisExpression(e);

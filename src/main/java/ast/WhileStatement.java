@@ -6,7 +6,6 @@ public class WhileStatement extends Statement {
     private Statement statement;
 
     public WhileStatement(Expression expression, Statement statement) {
-        super();
         this.expression = expression;
         this.statement = statement;
     }

@@ -1,7 +1,5 @@
 package ast;
 
-import java.util.List;
-
 public class Program extends ASTNode {
 
 	private Definition fd;
