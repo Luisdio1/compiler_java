@@ -1,18 +1,24 @@
 package ast;
 
+import java.util.List;
+
 public class Program extends ASTNode {
 
-	private Object fd;
+	private Definition fd;
 
 	public Program() {
 	}
 
-	public Program(Object fd) {
+	public Program(Definition fd) {
 		this.fd = fd;
 	}
 
-	public Object getFd() {
+	public Definition getFd() {
 		return fd;
+	}
+
+	public void setFd(Definition fd) {
+		this.fd = fd;
 	}
 
 	@Override

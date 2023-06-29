@@ -1,4 +1,7 @@
 fun hello () : nothing
 {
     puts("Hello world!\n");
+    if (x < 1) then 
+        puts("Yes it is");
+    
 }

@@ -34,4 +34,13 @@ public interface ASTVisitor {
     void visit(WhileStatement node) throws ASTVisitorException;
 
     void visit(PutsStatement node) throws ASTVisitorException;
+
+    void visit(FunctionDefinition node) throws ASTVisitorException;
+
+    void visit(FunctionDeclaration node) throws ASTVisitorException;
+
+    void visit(FunctionParameterDefinition node) throws ASTVisitorException;
+
+    void visit(IfStatement node) throws ASTVisitorException;
+
 }

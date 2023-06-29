@@ -59,7 +59,8 @@ parser code
 
 terminal AND, OR, NOT;
 terminal PUTS;
-terminal CHAR, INT;
+terminal CHAR;
+terminal INT;
 terminal DO, WHILE;
 terminal FUN;
 terminal IF, ELSE, THEN;
@@ -80,21 +81,19 @@ terminal java.lang.String     STRING_LITERAL;
 terminal java.lang.Character  CHAR_LITERAL;
 
 non terminal Program program;
-non terminal func_def;
-non terminal header;
-non terminal local_defs;
-non terminal local_def;
-non terminal block;
-non terminal fpar_defs;
-non terminal fpar_def;
-non terminal ret_type;
-non terminal ids;
-non terminal fpar_type;
-non terminal data_type;
-non terminal type;
+non terminal Definition func_def;
+non terminal List<Definition> local_defs;
+non terminal Definition local_def;
+non terminal List<Definition> fpar_defs;
+non terminal Definition fpar_def;
+non terminal Type ret_type;
+non terminal List<String> ids;
+non terminal Type fpar_type;
+non terminal Type data_type;
+non terminal Type type;
 non terminal int_consts;
-non terminal func_decl;
-non terminal var_def;
+non terminal Definition func_decl;
+non terminal Definition var_def;
 non terminal List<Statement> stmts;
 non terminal Statement stmt;
 non terminal func_call;
@@ -127,27 +126,70 @@ program ::= /* empty */
           :} 
           ;
 
-func_def ::= header local_defs block 
-           | header block
+func_def ::= FUN:f IDENTIFIER:i LPAREN:lp fpar_defs:fds RPAREN COLON ret_type:rt local_defs:lds LCURLY stmts:ss RCURLY 
+            {:
+                RESULT = new FunctionDefinition(rt, i, fds, lds, ss);
+                RESULT.setLine(fleft);
+                RESULT.setColumn(fright);
+            :}
+           | FUN:f IDENTIFIER:i LPAREN:lp fpar_defs:fds RPAREN COLON ret_type:rt LCURLY stmts:ss RCURLY
+            {:
+                RESULT = new FunctionDefinition(rt, i, fds, new ArrayList<Definition>(), ss);
+                RESULT.setLine(fleft);
+                RESULT.setColumn(fright);
+            :}
            ;
 
-header ::= FUN IDENTIFIER LPAREN fpar_defs RPAREN COLON ret_type ;
-
-fpar_defs ::= fpar_def SEMICOLON fpar_defs
-            | fpar_def
-            |
+fpar_defs ::= fpar_def:f SEMICOLON fpar_defs:fs
+            {:
+              fs.add(f);
+              RESULT = fs;
+            :}
+            | fpar_def:f
+            {:
+              RESULT = new ArrayList<Definition>();
+              RESULT.add(f);
+            :}
+            | /* empty */
+            {:
+              RESULT = new ArrayList<Definition>();
+            :}
             ;
 
-fpar_def ::= REF ids COLON fpar_type
-           | ids COLON fpar_type    
+fpar_def ::= REF:r ids:i COLON fpar_type:ft
+            {:
+              RESULT = new FunctionParameterDefinition(ft, i, true);
+              RESULT.setLine(rleft);
+              RESULT.setColumn(rright);
+            :}
+           | ids:i COLON fpar_type:ft   
+            {:
+              RESULT = new FunctionParameterDefinition(ft, i, false);
+              RESULT.setLine(ftleft);
+              RESULT.setColumn(ftright);
+            :}
            ;
 
-ids      ::= IDENTIFIER COMMA ids
-           | IDENTIFIER
+ids      ::= IDENTIFIER:i COMMA ids:is
+              {:
+                 is.add(i);
+                 RESULT = is;
+              :}
+           | IDENTIFIER:i
+              {:
+                 RESULT = new ArrayList<String>();
+                 RESULT.add(i);
+              :}
            ;
 
-data_type ::= INT
-            | CHAR
+data_type ::= INT:i
+            {:
+              RESULT = Type.INT;
+            :}
+            | CHAR:c
+            {:
+              RESULT = Type.CHAR;
+            :}
             ;
 
 type ::= data_type int_consts ; 
@@ -156,24 +198,59 @@ int_consts ::=
              | LBRACKET INTEGER_LITERAL RBRACKET int_consts
              ;
 
-ret_type ::= data_type
-           | NOTHING
+ret_type ::= data_type:d
+            {:
+              RESULT = d;
+            :}
+           | NOTHING:n
+            {:
+                RESULT = Type.NOTHING;
+            :}
            ;
 
 fpar_type ::= data_type LBRACKET RBRACKET int_consts
             | data_type int_consts
             ;
 
-local_defs ::= local_def
-             | local_defs local_def
+local_defs ::= local_def:l
+                {:
+                RESULT = new ArrayList<Definition>();
+                RESULT.add(l);
+                :}
+             | local_defs:ls local_def:l
+                {:
+                ls.add(l);
+                RESULT = ls;
+                :}
              ;
 
-local_def ::= func_def
-            | func_decl
-            | var_def
+local_def ::= func_def:fd
+            {:
+              RESULT = fd;
+            :}
+            | func_decl:fl
+            {:
+              RESULT = fl;
+            :}
+            | var_def:vd
+            {:
+              RESULT = vd;
+            :}
             ;
 
-func_decl ::= header SEMICOLON ;
+func_decl ::= FUN:f IDENTIFIER:i LPAREN:lp fpar_defs:fds RPAREN COLON ret_type:rt local_defs:lds SEMICOLON 
+            {:
+                RESULT = new FunctionDeclaration(rt, i, fds, lds);
+                RESULT.setLine(fleft);
+                RESULT.setColumn(fright);
+            :}
+            | FUN:f IDENTIFIER:i LPAREN:lp fpar_defs:fds RPAREN COLON ret_type:rt SEMICOLON
+            {:
+                RESULT = new FunctionDeclaration(rt, i, fds, new ArrayList<Definition>());
+                RESULT.setLine(fleft);
+                RESULT.setColumn(fright);
+            :}
+            ;
 
 var_def ::= VAR ids COLON type SEMICOLON ;
 
@@ -198,16 +275,19 @@ stmt ::= SEMICOLON
          :}
        | IDENTIFIER SPACER expr SEMICOLON
        | STRING_LITERAL SPACER expr SEMICOLON
-       | block
+       | LCURLY stmts:ss RCURLY
        | func_call SEMICOLON
-       | IF cond THEN stmt 
-       | IF cond THEN stmt ELSE stmt
+       | IF:i expr:e THEN stmt:s 
+       {:
+         RESULT = new IfStatement(e, s);
+         RESULT.setLine(ileft);
+         RESULT.setColumn(iright);
+       :}
+       | IF:i cond:c THEN stmt:s ELSE stmt:ss
        | WHILE cond DO stmt
        | RETURN expr SEMICOLON
        | RETURN SEMICOLON
        ;
-
-block ::= LCURLY stmts RCURLY ;
 
 func_call ::= IDENTIFIER LPAREN RPAREN
             | IDENTIFIER LPAREN exprs RPAREN

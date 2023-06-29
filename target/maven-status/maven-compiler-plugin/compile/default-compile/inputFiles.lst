@@ -1,10 +1,14 @@
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\IdentifierExpression.java
+C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\FunctionDeclaration.java
+C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\FunctionParameterDefinition.java
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\CharLiteralExpression.java
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\StatementGroup.java
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\Statement.java
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\PrintASTVisitor.java
+C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\Definition.java
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\UnaryExpression.java
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\sym.java
+C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\Declaration.java
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\parser.java
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\ParenthesisCondition.java
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\WhileStatement.java
@@ -20,8 +24,11 @@ C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\St
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\BinaryCondition.java
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\ASTVisitor.java
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\BinaryExpression.java
+C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\FunctionDefinition.java
+C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\IfStatement.java
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\Lexer.java
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\UnaryCondition.java
+C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\Type.java
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\Operator.java
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\ParenthesisExpression.java
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\Condition.java

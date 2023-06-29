@@ -7,8 +7,13 @@ import ast.BinaryExpression;
 import ast.Program;
 import ast.StatementGroup;
 import ast.IdentifierExpression;
+import ast.IfStatement;
 import ast.IntegerLiteralExpression;
 import ast.CharLiteralExpression;
+import ast.Definition;
+import ast.FunctionDeclaration;
+import ast.FunctionDefinition;
+import ast.FunctionParameterDefinition;
 import ast.ParenthesisExpression;
 import ast.ParenthesisCondition;
 import ast.Statement;
@@ -23,7 +28,7 @@ public class PrintASTVisitor implements ASTVisitor {
     
     @Override
     public void visit(Program node) throws ASTVisitorException {
-        ((SpacerStatement) node.getFd()).accept(this);
+        node.getFd().accept(this);
     }
 
     @Override
@@ -125,5 +130,55 @@ public class PrintASTVisitor implements ASTVisitor {
 		System.out.print("puts( ");
         node.getExpression().accept(this);
         System.out.println(" );");
+	}
+
+	@Override
+	public void visit(FunctionDefinition node) throws ASTVisitorException {
+		System.out.print("fun ");
+        System.out.print(node.getIdentifier());
+        System.out.print("(");
+        for(Definition fp: node.getParameterList()) {
+            fp.accept(this);
+            System.out.print(", ");
+        }
+        System.out.print(") : ");
+        System.out.println(node.getType());
+        System.out.println("{");
+        for (Statement st: node.getStatementList()) {
+            st.accept(this);
+        }
+        System.out.println("}");
+	}
+
+	@Override
+	public void visit(FunctionParameterDefinition node) throws ASTVisitorException {
+        for(String id: node.getIdentifier()) {
+            System.out.print(id);
+            System.out.print(" : ");
+            System.out.print(node.getType());
+            System.out.print(", ");
+        }
+	}
+
+	@Override
+	public void visit(FunctionDeclaration node) throws ASTVisitorException {
+		System.out.print("fun ");
+        System.out.print(node.getIdentifier());
+        System.out.print("(");
+        for(Definition fp: node.getParameterList()) {
+            fp.accept(this);
+            System.out.print(", ");
+        }
+        System.out.print(") : ");
+        System.out.println(node.getType());
+        System.out.println(";");
+	}
+
+	@Override
+	public void visit(IfStatement node) throws ASTVisitorException {
+		System.out.print("if ");
+        node.getExpression().accept(this);
+        System.out.println(" then ");
+        node.getStatement().accept(this);
 	}
 }
