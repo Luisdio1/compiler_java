@@ -1,5 +1,7 @@
 package ast;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class FunctionDeclaration extends Definition {
@@ -33,7 +35,9 @@ public class FunctionDeclaration extends Definition {
     }
     
     public List<Definition> getParameterList() {
-        return parameterList;
+        List<Definition> reversedParameters = new ArrayList<>(parameterList);
+        Collections.reverse(reversedParameters);
+        return reversedParameters;
     }
 
     public void setParameterList(List<Definition> parameterList) {
@@ -41,7 +45,9 @@ public class FunctionDeclaration extends Definition {
     }
 
     public List<Definition> getDefinitionList() {
-        return definitionList;
+        List<Definition> reversedDefinitions = new ArrayList<>(definitionList);
+        Collections.reverse(reversedDefinitions);
+        return reversedDefinitions;
     }
 
     public void setDefinitionList(List<Definition> definitionList) {

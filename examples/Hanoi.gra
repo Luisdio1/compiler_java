@@ -19,6 +19,6 @@ fun solve () : nothing
     var NumberOfRings : int;
 {
     puts("Rings: ");
-    NumberOfRings <- geti();
+    NumberOfRings <- get(3);
     hanoi(NumberOfRings, "left", "right", "middle");
 }

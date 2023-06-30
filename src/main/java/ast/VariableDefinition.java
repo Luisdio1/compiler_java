@@ -4,24 +4,14 @@ import java.util.List;
 
 public class VariableDefinition extends Definition {
 
-    private String identifier;
     private List<String> identifiers;
     private Type type;
     private List<Integer> dimensions;
 
-    public VariableDefinition(String identifier, List<String> identifiers, Type type, List<Integer> dimensions) {
-        this.identifier = identifier;
+    public VariableDefinition(List<String> identifiers, Type type, List<Integer> dimensions) {
         this.identifiers = identifiers;
         this.type = type;
         this.dimensions = dimensions;
-    }
-
-    public String getIdentifier() {
-        return identifier;
-    }
-
-    public void setIdentifier(String identifer) {
-    	this.identifier = identifer;
     }
 
     public List<String> getIdentifiers() {

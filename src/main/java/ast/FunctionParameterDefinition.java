@@ -4,32 +4,22 @@ import java.util.List;
 
 public class FunctionParameterDefinition extends Definition {
     
-    private Type type;
-    private String identifier;
+    private String type;
     private List<String> identifiers;
     private boolean ref;
     
-    public FunctionParameterDefinition(Type type, String identifier, List<String> identifiers, boolean ref) {
+    public FunctionParameterDefinition(String type, List<String> identifiers, boolean ref) {
         this.type = type;
-        this.identifier = identifier;
         this.identifiers = identifiers;
         this.ref = ref;
     }
     
-    public Type getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(Type type) {
+    public void setType(String type) {
         this.type = type;
-    }
-
-    public String getIdentifier() {
-        return identifier;
-    }
-
-    public void setIdentifier(String identifier) {
-        this.identifier = identifier;
     }
     
     public List<String> getIdentifiers() {

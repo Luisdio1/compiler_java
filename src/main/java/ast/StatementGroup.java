@@ -1,6 +1,7 @@
 package ast;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class StatementGroup extends Statement {
@@ -16,7 +17,9 @@ public class StatementGroup extends Statement {
     }
 
     public List<Statement> getStatements() {
-        return statements;
+        List<Statement> reversedStatements = new ArrayList<>(statements);
+        Collections.reverse(reversedStatements);
+        return reversedStatements;
     }
 
     public void setStatements(List<Statement> statements) {

@@ -5,7 +5,7 @@ public enum Operator {
     PLUS("+"),
     MINUS("-"),
     TIMES("*"),
-    DIV("/"),
+    DIV("div"),
     MOD("mod"),
     EQ("="),
     NEQ("#"),

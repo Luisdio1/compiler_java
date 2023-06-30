@@ -1,5 +1,7 @@
 package ast;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class LocalDefinition extends Definition {
@@ -11,7 +13,9 @@ public class LocalDefinition extends Definition {
     }
 
     public List<Definition> getDefinitions() {
-        return definitions;
+        List<Definition> reversedDefinitions = new ArrayList<>(definitions);
+        Collections.reverse(reversedDefinitions);
+        return reversedDefinitions;
     }
 
     public void setDefinitions(List<Definition> definitions) {

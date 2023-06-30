@@ -1,23 +1,25 @@
 package ast;
 
+import java.util.List;
+
 public class IfElseStatement extends Statement {
 
-    private Expression expression;
+    private List<Condition> conditions;
     private Statement statement1;
     private Statement statement2;
 
-    public IfElseStatement(Expression expression, Statement statement1, Statement statement2) {
-        this.expression = expression;
+    public IfElseStatement(List<Condition> conditions, Statement statement1, Statement statement2) {
+        this.conditions = conditions;
         this.statement1 = statement1;
         this.statement2 = statement2;
     }
 
-    public Expression getExpression() {
-        return expression;
+    public List<Condition> getCondition() {
+        return conditions;
     }
 
-    public void setExpression(Expression expression) {
-        this.expression = expression;
+    public void setCondition(List<Condition> conditions) {
+        this.conditions = conditions;
     }
 
     public Statement getStatement1() {

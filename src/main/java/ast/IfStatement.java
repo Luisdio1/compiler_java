@@ -1,12 +1,14 @@
 package ast;
 
+import java.util.List;
+
 public class IfStatement extends Statement {
 
-    private Expression expression;
+    private List<Condition> conditions;
     private Statement statement;
 
-    public IfStatement(Expression expression, Statement statement) {
-        this.expression = expression;
+    public IfStatement(List<Condition> conditions, Statement statement) {
+        this.conditions = conditions;
         this.statement = statement;
     }
 
@@ -18,12 +20,12 @@ public class IfStatement extends Statement {
         this.statement = statement;
     }
 
-    public Expression getExpression() {
-        return expression;
+    public List<Condition> getCondition() {
+        return conditions;
     }
 
-    public void setExpression(Expression expression) {
-        this.expression = expression;
+    public void setCondition(List<Condition> conditions) {
+        this.conditions = conditions;
     }
 
     @Override

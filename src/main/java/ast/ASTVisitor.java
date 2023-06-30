@@ -49,18 +49,18 @@ public interface ASTVisitor {
 
     void visit(IfElseStatement node) throws ASTVisitorException;
 
-    // void visit(ArrayExpression node) throws ASTVisitorException;
-
     void visit(ReturnStatement node) throws ASTVisitorException;
 
     void visit(VariableDefinition node) throws ASTVisitorException;
 
-    // void visit(LValueExpression node) throws ASTVisitorException;
+    void visit(LValueExpression node) throws ASTVisitorException;
 
     void visit(BlockStatement node) throws ASTVisitorException;
 
     void visit(LocalDefinition node) throws ASTVisitorException;
 
     void visit(HeaderDefinition node) throws ASTVisitorException;
+
+    void visit(ArrayType node) throws ASTVisitorException;
 
 }

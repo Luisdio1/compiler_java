@@ -1,21 +1,23 @@
 package ast;
 
+import java.util.List;
+
 public class WhileStatement extends Statement {
 
-    private Expression expression;
+    private List<Condition> conditions;
     private Statement statement;
 
-    public WhileStatement(Expression expression, Statement statement) {
-        this.expression = expression;
+    public WhileStatement(List<Condition> conditions, Statement statement) {
+        this.conditions = conditions;
         this.statement = statement;
     }
 
-    public Expression getExpression() {
-        return expression;
+    public List<Condition> getCondition() {
+        return conditions;
     }
 
-    public void setExpression(Expression expression) {
-        this.expression = expression;
+    public void setCondition(List<Condition> conditions) {
+        this.conditions = conditions;
     }
 
     public Statement getStatement() {

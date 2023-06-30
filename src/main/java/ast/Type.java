@@ -15,6 +15,10 @@ public enum Type {
         return type;
     }
 
+    public void setType(Object type) {
+        this.type = type;
+    }
+
     @Override
     public String toString() {
         return type.toString();

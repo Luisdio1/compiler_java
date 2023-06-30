@@ -87,7 +87,7 @@ non terminal Definition fpar_def;
 non terminal List<Definition> fpar_defs;
 non terminal Type data_type;
 non terminal Type ret_type;
-non terminal Type fpar_type;
+non terminal String fpar_type;
 non terminal Definition local_def;
 non terminal List<Definition> local_defs;
 non terminal Definition var_def;
@@ -102,6 +102,7 @@ non terminal List<Integer> arrays;
 non terminal Expression expr;
 non terminal List<Expression> exprs;
 non terminal Condition cond;
+non terminal List<Condition> conds;
 
 precedence left OR;
 precedence left AND;
@@ -130,52 +131,58 @@ func_def ::= header:h local_defs:ls block:b
           :}
           ;
 
-header ::= FUN:f IDENTIFIER:i LPAREN:lp fpar_def:fd fpar_defs:fds RPAREN COLON ret_type:rt
+header ::= FUN:f IDENTIFIER:i LPAREN:lp fpar_defs:fds RPAREN COLON ret_type:rt
           {:
-            RESULT = new HeaderDefinition(rt, i, fd, fds);
+            RESULT = new HeaderDefinition(rt, i, fds);
             RESULT.setLine(fleft);
             RESULT.setColumn(fright);
           :}
           ;
 
-fpar_defs ::= /* empty */
+fpar_defs ::= fpar_def:fd fpar_defs:fds
+            {:
+              fds.add(fd);
+              RESULT = fds;
+            :}
+            | SEMICOLON fpar_def:fd fpar_defs:fds
+            {:
+              RESULT = new ArrayList<Definition>();
+              RESULT.add(fd);
+            :}
+            | /* empty */
             {:
               RESULT = new ArrayList<Definition>();
             :}
-            | SEMICOLON fpar_def:fd fpar_defs:fs
-            {:
-              fs.add(fd);
-              RESULT = fs;
-            :}
             ;
 
-fpar_def ::= /* empty */
+fpar_def ::= REF:r ids:is COLON fpar_type:ft
             {:
-                RESULT = null;
-            :}
-           | REF:r IDENTIFIER:i ids:is COLON fpar_type:ft
-            {:
-              RESULT = new FunctionParameterDefinition(ft, i, is, true);
+              RESULT = new FunctionParameterDefinition(ft, is, true);
               RESULT.setLine(rleft);
               RESULT.setColumn(rright);
             :}
-           | IDENTIFIER:i ids:is COLON fpar_type:ft   
+           | ids:is COLON fpar_type:ft   
             {:
-              RESULT = new FunctionParameterDefinition(ft, i, is, false);
-              RESULT.setLine(ileft);
-              RESULT.setColumn(iright);
+              RESULT = new FunctionParameterDefinition(ft, is, false);
+              RESULT.setLine(isleft);
+              RESULT.setColumn(isright);
             :}
            ;
 
-ids      ::= /* empty */
-            {:
-                 RESULT = new ArrayList<String>();
-            :}
+ids      ::= IDENTIFIER:i ids:is
+           {:
+              is.add(i);
+              RESULT = is;
+           :}
            | COMMA IDENTIFIER:i ids:is
-              {:
-                 is.add(i);
-                 RESULT = is;
-              :}
+            {:
+                RESULT = new ArrayList<String>();
+                RESULT.add(i);
+            :}
+           | /* empty */
+            {:
+                RESULT = new ArrayList<String>();
+            :}
            ;
 
 ret_type ::= data_type:dt 
@@ -190,11 +197,13 @@ ret_type ::= data_type:dt
 
 fpar_type ::= data_type:dt LBRACKET RBRACKET arrays:as 
             {:
-                RESULT = dt;
+                ArrayType o = new ArrayType(dt, as, true);
+                RESULT = o.getArrayType();
             :}
             | data_type:dt arrays:as
             {:
-                RESULT = dt;
+                ArrayType o = new ArrayType(dt, as, false);
+                RESULT = o.getArrayType();
             :}
             ;
 
@@ -212,20 +221,20 @@ local_def ::= func_def:fd
             :}
             ;
 
-local_defs ::= /* empty */
-            {:
-              RESULT = new ArrayList<Definition>();
-            :}
-            | local_def:ld local_defs:lds
+local_defs ::= local_def:ld local_defs:lds
             {:
               lds.add(ld);
               RESULT = lds;
             :}
+            | /* empty */
+            {:
+              RESULT = new ArrayList<Definition>();
+            :}
             ;
 
-var_def ::= VAR:v IDENTIFIER:i ids:is COLON data_type:dt arrays:as SEMICOLON 
+var_def ::= VAR:v ids:is COLON data_type:dt arrays:as SEMICOLON 
           {:
-            RESULT = new VariableDefinition(i, is, dt, as);
+            RESULT = new VariableDefinition(is, dt, as);
             RESULT.setLine(vleft);
             RESULT.setColumn(vright);
           :}
@@ -284,21 +293,21 @@ stmt ::= SEMICOLON:s
             RESULT.setLine(pleft);
             RESULT.setColumn(pright);
          :}
-       | IF:i expr:e THEN stmt:s 
+       | IF:i conds:cs THEN stmt:s 
          {:
-            RESULT = new IfStatement(e, s);
+            RESULT = new IfStatement(cs, s);
             RESULT.setLine(ileft);
             RESULT.setColumn(iright);
          :}
-       | IF:i expr:e THEN stmt:s1 ELSE stmt:s2
+       | IF:i conds:cs THEN stmt:s1 ELSE stmt:s2
          {:
-            RESULT = new IfElseStatement(e, s1, s2);
+            RESULT = new IfElseStatement(cs, s1, s2);
             RESULT.setLine(ileft);
             RESULT.setColumn(iright);
          :}
-       | WHILE:w expr:e DO stmt:s
+       | WHILE:w conds:cs DO stmt:s
          {:
-            RESULT = new WhileStatement(e, s);
+            RESULT = new WhileStatement(cs, s);
             RESULT.setLine(wleft);
             RESULT.setColumn(wright);
          :}
@@ -318,18 +327,18 @@ stmt ::= SEMICOLON:s
 
 block ::= LCURLY:lc stmts:ss RCURLY 
         {:
-            RESULT = new BlockStatement(ss);
+            RESULT = new StatementGroup(ss);
         :}
         ;
 
-stmts ::= /* empty */
-        {:
-            RESULT = new ArrayList<Statement>();
-        :}
-        | stmt:s stmts:ss
+stmts ::= stmt:s stmts:ss
         {:
             ss.add(s);
             RESULT = ss;
+        :}
+        | /* empty */
+        {:
+            RESULT = new ArrayList<Statement>();
         :}
         ;
 
@@ -354,19 +363,15 @@ exprs ::= COMMA expr:e exprs:es
 
 l_value ::= IDENTIFIER:i 
           {:
-                RESULT = new IdentifierExpression(i, null);
-          :}
-          | IDENTIFIER:i LBRACKET expr:e RBRACKET
-          {:
-                RESULT = new IdentifierExpression(i, e);
+                RESULT = new IdentifierExpression(i);
           :}
           | STRING_LITERAL:s
           {:
-                RESULT = new StringLiteralExpression(s, null);
+                RESULT = new StringLiteralExpression(s);
           :}
-          | STRING_LITERAL:s LBRACKET expr:e RBRACKET
+          | l_value:lv LBRACKET expr:e RBRACKET
           {:
-                RESULT = new StringLiteralExpression(s, e);
+                RESULT = new LValueExpression(lv, e);
           :}
           ;
 
@@ -435,43 +440,18 @@ expr ::= INTEGER_LITERAL:l
              RESULT.setLine(e1left);
              RESULT.setColumn(e1right);
          :}
-       | expr:e1 EQ expr:e2
-         {:
-             RESULT = new BinaryExpression(Operator.EQ, e1, e2);
-             RESULT.setLine(e1left);
-             RESULT.setColumn(e1right);
-         :}
-       | expr:e1 NEQ expr:e2
-         {:
-             RESULT = new BinaryExpression(Operator.NEQ, e1, e2);
-             RESULT.setLine(e1left);
-             RESULT.setColumn(e1right);
-         :}
-       | expr:e1 LTHAN expr:e2
-         {:
-             RESULT = new BinaryExpression(Operator.LTHAN, e1, e2);
-             RESULT.setLine(e1left);
-             RESULT.setColumn(e1right);
-         :}
-       | expr:e1 GTHAN expr:e2
-         {:
-             RESULT = new BinaryExpression(Operator.GTHAN, e1, e2);
-             RESULT.setLine(e1left);
-             RESULT.setColumn(e1right);
-         :}
-       | expr:e1 LEQ expr:e2
-         {:
-             RESULT = new BinaryExpression(Operator.LEQ, e1, e2);
-             RESULT.setLine(e1left);
-             RESULT.setColumn(e1right);
-         :}
-       | expr:e1 GEQ expr:e2
-         {:
-             RESULT = new BinaryExpression(Operator.GEQ, e1, e2);
-             RESULT.setLine(e1left);
-             RESULT.setColumn(e1right);
-         :}
        ;
+
+conds ::= cond:c conds:cs
+        {:
+            cs.add(c);
+            RESULT = cs;
+        :}
+        | /* empty */
+        {:
+            RESULT = new ArrayList<Condition>();
+        :}
+        ;
 
 cond ::= LPAREN:lp cond:c RPAREN
          {:
@@ -496,5 +476,41 @@ cond ::= LPAREN:lp cond:c RPAREN
              RESULT = new BinaryCondition(Operator.OR, c1, c2);
              RESULT.setLine(c1left);
              RESULT.setColumn(c1right);
+         :}
+       | expr:e1 EQ expr:e2
+         {:
+             RESULT = new BinaryCondition(Operator.EQ, e1, e2);
+             RESULT.setLine(e1left);
+             RESULT.setColumn(e1right);
+         :}
+       | expr:e1 NEQ expr:e2
+         {:
+             RESULT = new BinaryCondition(Operator.NEQ, e1, e2);
+             RESULT.setLine(e1left);
+             RESULT.setColumn(e1right);
+         :}
+       | expr:e1 LTHAN expr:e2
+         {:
+             RESULT = new BinaryCondition(Operator.LTHAN, e1, e2);
+             RESULT.setLine(e1left);
+             RESULT.setColumn(e1right);
+         :}
+       | expr:e1 GTHAN expr:e2
+         {:
+             RESULT = new BinaryCondition(Operator.GTHAN, e1, e2);
+             RESULT.setLine(e1left);
+             RESULT.setColumn(e1right);
+         :}
+       | expr:e1 LEQ expr:e2
+         {:
+             RESULT = new BinaryCondition(Operator.LEQ, e1, e2);
+             RESULT.setLine(e1left);
+             RESULT.setColumn(e1right);
+         :}
+       | expr:e1 GEQ expr:e2
+         {:
+             RESULT = new BinaryCondition(Operator.GEQ, e1, e2);
+             RESULT.setLine(e1left);
+             RESULT.setColumn(e1right);
          :}
        ;

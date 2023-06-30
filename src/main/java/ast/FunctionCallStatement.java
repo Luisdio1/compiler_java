@@ -1,5 +1,7 @@
 package ast;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class FunctionCallStatement extends Statement {
@@ -31,7 +33,9 @@ public class FunctionCallStatement extends Statement {
     }
 
     public List<Expression> getExpressions() {
-        return expressions;
+        List<Expression> reversedExpressions = new ArrayList<>(expressions);
+        Collections.reverse(reversedExpressions);
+        return reversedExpressions;
     }
 
     public void setExpression(List<Expression> expressions) {
