@@ -4,11 +4,10 @@
 
     <groupId>org.hua</groupId>
     <artifactId>compiler</artifactId>
-    <version>0.0.2</version>
+    <version>0.1.5</version>
     <packaging>jar</packaging>
 
-    <name>compiler-lab2</name>
-    <url>http://www.dit.hua.gr</url>
+    <name>Grace-Compiler</name>
 
     <properties>
         <java.version>1.8</java.version>
@@ -20,9 +19,11 @@
         <args4j.version>2.0.16</args4j.version>
         <jflex.version>1.8.2</jflex.version>
         <java-cup.version>0.11a</java-cup.version>
+        <commons-lang3.version>3.4</commons-lang3.version>
         <org.slf4j.version>1.6.4</org.slf4j.version>
         <logback.version>1.0.1</logback.version>
         <junit.version>4.8.2</junit.version>
+        <asm.version>7.3.1</asm.version>
     </properties>
 
     <dependencies>
@@ -72,6 +73,31 @@
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>${commons-lang3.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.ow2.asm</groupId>
+			<artifactId>asm</artifactId>
+			<version>${asm.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.ow2.asm</groupId>
+			<artifactId>asm-commons</artifactId>
+			<version>${asm.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.ow2.asm</groupId>
+			<artifactId>asm-tree</artifactId>
+			<version>${asm.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.ow2.asm</groupId>
+			<artifactId>asm-util</artifactId>
+			<version>${asm.version}</version>
+		</dependency>
     </dependencies>
     <build>
         <plugins>
@@ -164,7 +190,7 @@
                     <mainClass>java_cup.Main</mainClass>
                     <arguments>
 						<argument>-expect</argument>
-                        <argument>2</argument>
+                        <argument>1</argument>
                         <argument>-destdir</argument>
                         <argument>${basedir}/src/main/java</argument>
                         <argument>${basedir}/src/main/cup/grammar.cup</argument>
@@ -194,7 +220,7 @@
                         <exclude>**/jflex/*</exclude>
                     </excludes>
                     <properties>
-                        <years>2012-2016</years>
+                        <years>2012-2020</years>
                     </properties>
                 </configuration>
             </plugin>

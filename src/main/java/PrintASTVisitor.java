@@ -34,7 +34,7 @@ import ast.PutsStatement;
 import ast.ReturnStatement;
 
 public class PrintASTVisitor implements ASTVisitor {
-    int indent = 0;
+    private int indent = 0;
     String indentString = "    ";
     
     @Override
@@ -44,25 +44,19 @@ public class PrintASTVisitor implements ASTVisitor {
 
     @Override
 	public void visit(FunctionDefinition node) throws ASTVisitorException {
-        for (int z = 0; z < indent; z++) {
-            System.out.print(indentString);
-        }
+        printIdentation();
         node.getHeader().accept(this);
         indent++;
         for (int i = 0; i < node.getDefinitions().size(); i++) {
             node.getDefinitions().get(i).accept(this);
         }
         indent--;
-        for (int z = 0; z < indent; z++) {
-            System.out.print(indentString);
-        }
+        printIdentation();
         System.out.println("{");
         node.getBlock().accept(this);
         System.out.println("}");
         indent++;
-        for (int z = 0; z < indent; z++) {
-            System.out.print(indentString);
-        }
+        printIdentation();
         indent--;
 	}
 
@@ -100,15 +94,11 @@ public class PrintASTVisitor implements ASTVisitor {
     public void visit(StatementGroup node) throws ASTVisitorException {
         indent++;
         for(Statement st: node.getStatements()) { 
-            for (int z = 0; z < indent; z++) {
-                System.out.print(indentString);
-            }
+            printIdentation();
             st.accept(this);
         }
         indent--;
-        for (int z = 0; z < indent; z++) {
-            System.out.print(indentString);
-        }
+        printIdentation();
     }
 
     @Override
@@ -118,9 +108,7 @@ public class PrintASTVisitor implements ASTVisitor {
 
     @Override
 	public void visit(VariableDefinition node) throws ASTVisitorException {
-		for (int z = 0; z < indent-1; z++) {
-            System.out.print(indentString);
-        }
+		printIdentation();
         System.out.print("var ");
         for(String id: node.getIdentifiers()) {
             System.out.print(id);
@@ -210,19 +198,13 @@ public class PrintASTVisitor implements ASTVisitor {
         }
         System.out.println(" then {");
         indent++;
-        for (int z = 0; z < indent; z++) {
-            System.out.print(indentString);
-        }
+        printIdentation();
         indent--;
         node.getStatement1().accept(this);
-        for (int z = 0; z < indent; z++) {
-            System.out.print(indentString);
-        }
+        printIdentation();
         System.out.println("} else {");
         indent++;
-        for (int z = 0; z < indent; z++) {
-            System.out.print(indentString);
-        }
+        printIdentation();
         indent--;
         node.getStatement2().accept(this);
         System.out.println("}");
@@ -239,15 +221,12 @@ public class PrintASTVisitor implements ASTVisitor {
         }
         System.out.println(") do {");
         indent++;
-        for (int z = 0; z < indent; z++) {
-            System.out.print(indentString);
-        }
+        printIdentation();
         indent--;
         node.getStatement().accept(this);
         System.out.println("}");
     }
 
-    //OKOKOKOKOK
     @Override
 	public void visit(ReturnStatement node) throws ASTVisitorException {
 		System.out.print("return ");
@@ -344,4 +323,10 @@ public class PrintASTVisitor implements ASTVisitor {
             node.getExpression2().accept(this);
         }
 	}
+
+    public void printIdentation() {
+        for (int i = 0; i < indent; i++) {
+            System.out.print(indentString);
+        }
+    }
 }

@@ -7,11 +7,13 @@ C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\LV
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\PrintASTVisitor.java
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\Definition.java
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\UnaryExpression.java
+C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\symbol\SymbolTable.java
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\EmptyStatement.java
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\sym.java
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\Declaration.java
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\HeaderDefinition.java
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\parser.java
+C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\symbol\HashSymbolTable.java
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\ArrayType.java
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\ParenthesisCondition.java
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\WhileStatement.java
@@ -22,9 +24,11 @@ C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\AS
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\IfElseStatement.java
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\IntegerLiteralExpression.java
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\Program.java
+C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\SymTableBuilderASTVisitor.java
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\Expression.java
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\SpacerStatement.java
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\StringLiteralExpression.java
+C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\ASTUtils.java
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\FunctionCallExpression.java
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\BinaryCondition.java
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\ASTVisitor.java
@@ -38,5 +42,6 @@ C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\Ty
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\Operator.java
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\ParenthesisExpression.java
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\FunctionCallStatement.java
+C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\symbol\Info.java
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\VariableDefinition.java
 C:\Users\yiwrg\Desktop\Projects\compiler-java\compiler_java\src\main\java\ast\Condition.java

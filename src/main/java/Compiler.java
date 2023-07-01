@@ -25,22 +25,26 @@ public class Compiler {
                 }
             }
             for (int i = firstFilePos; i < args.length; i++) {
-                Lexer scanner = null;
+                Lexer lexer = null;
                 try {
                     java.io.FileInputStream stream = new java.io.FileInputStream(args[i]);
                     LOGGER.info("Scanning file " + args[i]);
                     java.io.Reader reader = new java.io.InputStreamReader(stream, encodingName);
-                    scanner = new Lexer(reader);
+                    lexer = new Lexer(reader);
                     
                     // parse
-                    parser p = new parser(scanner);
-                    ASTNode compUnit = (ASTNode) p.parse().value;
+                    parser p = new parser(lexer);
+                    ASTNode program = (ASTNode) p.parse().value;
                     LOGGER.info("Constructed AST");
                     
                     // print program
                     LOGGER.info("Input:");
                     ASTVisitor printVisitor = new PrintASTVisitor();
-                    compUnit.accept(printVisitor);
+                    program.accept(printVisitor);
+
+                    // build symbol table
+                    ASTVisitor symTableVisitor = new SymTableBuilderASTVisitor();
+                    program.accept(symTableVisitor);
                     
                     LOGGER.info("Compilation done");
                 } catch (java.io.FileNotFoundException e) {

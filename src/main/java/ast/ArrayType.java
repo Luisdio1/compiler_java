@@ -2,7 +2,7 @@ package ast;
 
 import java.util.List;
 
-public class ArrayType {
+public class ArrayType extends ASTNode {
     
     private Type type;
     private List<Integer> size;
