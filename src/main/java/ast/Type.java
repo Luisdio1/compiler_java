@@ -3,7 +3,8 @@ package ast;
 public enum Type {
     INT("int"),
     CHAR("char"),
-    NOTHING("nothing");
+    NOTHING("nothing"),
+    BOOLEAN("boolean");
 
     private Object type;
 

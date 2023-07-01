@@ -63,12 +63,10 @@ public class SymTableBuilderASTVisitor implements ASTVisitor {
 
 	@Override
 	public void visit(StatementGroup node) throws ASTVisitorException {
-		startScope();
 		ASTUtils.setSymbolTable(node, stack.element());
 		for (Statement st : node.getStatements()) {
 			st.accept(this);
 		}
-		endScope();
 	}
 
 	@Override
@@ -135,7 +133,9 @@ public class SymTableBuilderASTVisitor implements ASTVisitor {
 		for (Condition c: node.getCondition()) {
             c.accept(this);
         }
+		startScope();
 		node.getStatement().accept(this);
+		endScope();
 	}
 
 	@Override
@@ -167,7 +167,9 @@ public class SymTableBuilderASTVisitor implements ASTVisitor {
 		for (Condition c: node.getCondition()) {
             c.accept(this);
         }
+		startScope();
 		node.getStatement().accept(this);
+		endScope();
 	}
 
 	@Override
@@ -187,8 +189,10 @@ public class SymTableBuilderASTVisitor implements ASTVisitor {
 		for (Condition c: node.getCondition()) {
             c.accept(this);
         }
+		startScope();
 		node.getStatement1().accept(this);
         node.getStatement2().accept(this);
+		endScope();
 	}
 
 	@Override

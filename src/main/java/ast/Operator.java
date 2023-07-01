@@ -31,4 +31,14 @@ public enum Operator {
     public String toString() {
         return type;
     }
+
+    public boolean isUnary() {
+        return this.equals(Operator.PLUS) || this.equals(Operator.MINUS) || this.equals(Operator.NOT);
+    }
+
+    public boolean isRelational() {
+        return this.equals(Operator.EQ) || this.equals(Operator.NEQ)
+                || this.equals(Operator.GTHAN) || this.equals(Operator.GEQ)
+                || this.equals(Operator.LTHAN) || this.equals(Operator.LEQ);
+    }
 }

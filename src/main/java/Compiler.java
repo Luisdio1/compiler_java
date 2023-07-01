@@ -36,6 +36,19 @@ public class Compiler {
                     parser p = new parser(lexer);
                     ASTNode program = (ASTNode) p.parse().value;
                     LOGGER.info("Constructed AST");
+
+                    // keep global instance of program
+				    Registry.getInstance().setRoot(program);
+                    
+                    // build symbol table
+				    LOGGER.debug("Building symbol tables");
+				    program.accept(new SymTableBuilderASTVisitor());
+                    
+                    // construct types
+				    LOGGER.debug("Semantic check (1st pass)");
+				    program.accept(new CollectSymbolsASTVisitor());
+				    // LOGGER.debug("Semantic check (2nd pass)");
+				    // program.accept(new CollectTypesASTVisitor());                  
                     
                     // print program
                     LOGGER.info("Input:");
@@ -54,7 +67,7 @@ public class Compiler {
                     LOGGER.error(e.toString());
                 } catch (Exception e) {
                     LOGGER.error(e.getMessage());
-                    //e.printStackTrace();
+                    e.printStackTrace();
                 }
             }
         }
