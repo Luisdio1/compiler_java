@@ -21,7 +21,7 @@ fun main () : nothing
 
 {
     puts("Limit: ");
-    limit <- get(3);
+    limit <- get(i);
     puts("Primes:\n");
     counter <- 0;
     if limit >= 2 then {

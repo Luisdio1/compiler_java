@@ -37,8 +37,6 @@ public interface ASTVisitor {
 
     void visit(FunctionDefinition node) throws ASTVisitorException;
 
-    void visit(FunctionDeclaration node) throws ASTVisitorException;
-
     void visit(FunctionParameterDefinition node) throws ASTVisitorException;
 
     void visit(IfStatement node) throws ASTVisitorException;
@@ -55,12 +53,10 @@ public interface ASTVisitor {
 
     void visit(LValueExpression node) throws ASTVisitorException;
 
-    void visit(BlockStatement node) throws ASTVisitorException;
-
-    void visit(LocalDefinition node) throws ASTVisitorException;
-
     void visit(HeaderDefinition node) throws ASTVisitorException;
 
     void visit(ArrayType node) throws ASTVisitorException;
+
+    void visit(FunctionCallExpression node) throws ASTVisitorException;
 
 }

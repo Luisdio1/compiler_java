@@ -1,5 +1,7 @@
 package ast;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class IfElseStatement extends Statement {
@@ -15,7 +17,9 @@ public class IfElseStatement extends Statement {
     }
 
     public List<Condition> getCondition() {
-        return conditions;
+        List<Condition> reversedConditions = new ArrayList<>(conditions);
+        Collections.reverse(reversedConditions);
+        return reversedConditions;
     }
 
     public void setCondition(List<Condition> conditions) {

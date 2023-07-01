@@ -1,5 +1,7 @@
 package ast;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class VariableDefinition extends Definition {
@@ -15,7 +17,9 @@ public class VariableDefinition extends Definition {
     }
 
     public List<String> getIdentifiers() {
-        return identifiers;
+        List<String> reversedIdentifiers = new ArrayList<>(identifiers);
+        Collections.reverse(reversedIdentifiers);
+        return reversedIdentifiers;
     }
 
     public void setIdentifier(List<String> identifiers) {
@@ -31,7 +35,9 @@ public class VariableDefinition extends Definition {
     }
 
     public List<Integer> getDimensions() {
-        return dimensions;
+        List<Integer> reversedDimensions = new ArrayList<>(dimensions);
+        Collections.reverse(reversedDimensions);
+        return reversedDimensions;
     }
 
     public void setDimensions(List<Integer> dimensions) {

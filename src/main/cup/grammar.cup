@@ -78,7 +78,7 @@ terminal PLUS, MINUS;
 
 terminal java.lang.Integer    INTEGER_LITERAL;
 terminal java.lang.String     STRING_LITERAL;
-terminal java.lang.Character  CHAR_LITERAL;
+terminal java.lang.String     CHAR_LITERAL;
 
 non terminal Program program;
 non terminal Definition func_def;
@@ -95,7 +95,7 @@ non terminal Definition func_decl;
 non terminal Statement stmt;
 non terminal List<Statement> stmts;
 non terminal Statement block;
-non terminal Statement func_call;
+non terminal Expression func_call;
 non terminal Expression l_value;
 non terminal List<String> ids;
 non terminal List<Integer> arrays;
@@ -285,7 +285,9 @@ stmt ::= SEMICOLON:s
          :}
        | func_call:fc SEMICOLON
          {:
-            RESULT = fc;
+            RESULT = new FunctionCallStatement(fc);
+            RESULT.setLine(fcleft);
+            RESULT.setColumn(fcright);
          :}
        | PUTS:p LPAREN expr:e RPAREN SEMICOLON
          {:
@@ -344,7 +346,7 @@ stmts ::= stmt:s stmts:ss
 
 func_call ::= IDENTIFIER:i LPAREN:lp expr:e exprs:es RPAREN
             {:
-                RESULT = new FunctionCallStatement(i, e, es);
+                RESULT = new FunctionCallExpression(i, e, es);
                 RESULT.setLine(ileft);
                 RESULT.setColumn(iright);
             :}
@@ -389,9 +391,12 @@ expr ::= INTEGER_LITERAL:l
          :}
        | l_value:lv
          {:
-                RESULT = lv;
+             RESULT = lv;
          :}
        | func_call:fc
+         {:
+             RESULT = fc;
+         :}
        | LPAREN:lp expr:e RPAREN
          {:
              RESULT = new ParenthesisExpression(e);

@@ -2,17 +2,17 @@ package ast;
 
 public class CharLiteralExpression extends Expression {
 
-    private char literal;
+    private String literal;
 
-    public CharLiteralExpression(char literal) {
+    public CharLiteralExpression(String literal) {
         this.literal = literal;
     }
 
-    public char getLiteral() {
+    public String getLiteral() {
         return literal;
     }
 
-    public void setLiteral(char literal) {
+    public void setLiteral(String literal) {
         this.literal = literal;
     }
 

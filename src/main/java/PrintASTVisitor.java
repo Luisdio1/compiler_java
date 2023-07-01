@@ -5,7 +5,6 @@ import ast.ASTVisitorException;
 import ast.ArrayType;
 import ast.SpacerStatement;
 import ast.BinaryExpression;
-import ast.BlockStatement;
 import ast.Program;
 import ast.StatementGroup;
 import ast.IdentifierExpression;
@@ -13,13 +12,12 @@ import ast.IfElseStatement;
 import ast.IfStatement;
 import ast.IntegerLiteralExpression;
 import ast.LValueExpression;
-import ast.LocalDefinition;
 import ast.CharLiteralExpression;
 import ast.Definition;
 import ast.EmptyStatement;
 import ast.Expression;
+import ast.FunctionCallExpression;
 import ast.FunctionCallStatement;
-import ast.FunctionDeclaration;
 import ast.FunctionDefinition;
 import ast.FunctionParameterDefinition;
 import ast.HeaderDefinition;
@@ -36,6 +34,8 @@ import ast.PutsStatement;
 import ast.ReturnStatement;
 
 public class PrintASTVisitor implements ASTVisitor {
+    int indent = 0;
+    String indentString = "    ";
     
     @Override
     public void visit(Program node) throws ASTVisitorException {
@@ -43,124 +43,30 @@ public class PrintASTVisitor implements ASTVisitor {
     }
 
     @Override
-    public void visit(SpacerStatement node) throws ASTVisitorException {
-        node.getExpression1().accept(this);;
-        System.out.print(" <- ");
-        if (node.getExpression2() != null) {
-            node.getExpression2().accept(this);
-        } else {
-            ;
+	public void visit(FunctionDefinition node) throws ASTVisitorException {
+        for (int z = 0; z < indent; z++) {
+            System.out.print(indentString);
         }
-        System.out.println(";");
-    }
-
-    @Override
-    public void visit(BinaryExpression node) throws ASTVisitorException {
-        node.getExpression1().accept(this);
-        System.out.print(" ");
-        System.out.print(node.getOperator());
-        System.out.print(" ");
-        node.getExpression2().accept(this);
-    }
-
-    @Override
-    public void visit(UnaryExpression node) throws ASTVisitorException {
-        System.out.print(node.getOperator());
-        System.out.print(" ");
-        node.getExpression().accept(this);
-    }
-
-    @Override
-    public void visit(IdentifierExpression node) throws ASTVisitorException {
-        System.out.print(node.getIdentifier());
-    }
-
-    @Override
-    public void visit(IntegerLiteralExpression node) throws ASTVisitorException {
-        System.out.print(node.getLiteral());
-    }
-    
-    @Override
-    public void visit(StringLiteralExpression node) throws ASTVisitorException {
-        System.out.print("\"");
-        System.out.print(StringEscapeUtils.escapeJava(node.getLiteral()));
-        System.out.print("\"");
-    }
-
-    @Override
-    public void visit(ParenthesisExpression node) throws ASTVisitorException {
-        System.out.print("(");
-        node.getExpression().accept(this);
-        System.out.print(")");
-    }
-
-    @Override
-    public void visit(StatementGroup node) throws ASTVisitorException {
+        node.getHeader().accept(this);
+        indent++;
+        for (int i = 0; i < node.getDefinitions().size(); i++) {
+            node.getDefinitions().get(i).accept(this);
+        }
+        indent--;
+        for (int z = 0; z < indent; z++) {
+            System.out.print(indentString);
+        }
         System.out.println("{");
-        for(Statement st: node.getStatements()) { 
-            st.accept(this);
-        }
+        node.getBlock().accept(this);
         System.out.println("}");
-    }
-
-    public void visit(WhileStatement node) throws ASTVisitorException {
-        System.out.print("while ( ");
-        for (int i = 0; i < node.getCondition().size(); i++) {
-            node.getCondition().get(i).accept(this);
-            if (i < node.getCondition().size() - 1) {
-                System.out.print(" && ");
-            }
+        indent++;
+        for (int z = 0; z < indent; z++) {
+            System.out.print(indentString);
         }
-        System.out.println(" ) do ");
-        node.getStatement().accept(this);
-    }
-
-	@Override
-	public void visit(CharLiteralExpression node) throws ASTVisitorException {
-		System.out.print("\'");
-        System.out.print(node.getLiteral());
-        System.out.print("\'");
-	}
-
-	@Override
-	public void visit(BinaryCondition node) throws ASTVisitorException {
-		if (node.getCondition1() != null) {
-            node.getCondition1().accept(this);
-        } else {
-            node.getExpression1().accept(this);
-        }
-        System.out.print(" ");
-        System.out.print(node.getOperator());
-        System.out.print(" ");
-        if (node.getCondition2() != null) {
-            node.getCondition2().accept(this);
-        } else {
-            node.getExpression2().accept(this);
-        }
-	}
-
-	@Override
-	public void visit(UnaryCondition node) throws ASTVisitorException {
-		System.out.print(node.getOperator());
-        System.out.print(" ");
-        node.getCondition().accept(this);
+        indent--;
 	}
 
     @Override
-    public void visit(ParenthesisCondition node) throws ASTVisitorException {
-        System.out.print("( ");
-        node.getCondition().accept(this);
-        System.out.print(" )");
-    }
-
-	@Override
-	public void visit(PutsStatement node) throws ASTVisitorException {
-		System.out.print("puts( ");
-        node.getExpression().accept(this);
-        System.out.println(" );");
-	}
-
-	@Override
 	public void visit(HeaderDefinition node) throws ASTVisitorException {
 		System.out.print("fun ");
         System.out.print(node.getIdentifier());
@@ -171,11 +77,11 @@ public class PrintASTVisitor implements ASTVisitor {
                 System.out.print("; ");
             }
         }
-        System.out.print(") : ");
+        System.out.print("): ");
         System.out.println(node.getType());
 	}
 
-	@Override
+    @Override
 	public void visit(FunctionParameterDefinition node) throws ASTVisitorException {
         for (int i = 0; i < node.getIdentifiers().size(); i++) {
             if (node.getRef() == true) {
@@ -190,82 +96,32 @@ public class PrintASTVisitor implements ASTVisitor {
         }
 	}
 
-	@Override
-	public void visit(FunctionDeclaration node) throws ASTVisitorException {
-		System.out.print("fun ");
-        System.out.print(node.getIdentifier());
-        System.out.print("(");
-        for(Definition fp: node.getParameterList()) {
-            fp.accept(this);
-            System.out.print(", ");
-        }
-        System.out.print(") : ");
-        System.out.println(node.getType());
-        System.out.println(";");
-	}
-
-	@Override
-	public void visit(IfStatement node) throws ASTVisitorException {
-		System.out.print("if ");
-        for (int i = 0; i < node.getCondition().size(); i++) {
-            node.getCondition().get(i).accept(this);
-            if (i < node.getCondition().size() - 1) {
-                System.out.print(" && ");
+    @Override
+    public void visit(StatementGroup node) throws ASTVisitorException {
+        indent++;
+        for(Statement st: node.getStatements()) { 
+            for (int z = 0; z < indent; z++) {
+                System.out.print(indentString);
             }
+            st.accept(this);
         }
-        System.out.println(" then ");
-        System.out.print("\t");
-        node.getStatement().accept(this);
+        indent--;
+        for (int z = 0; z < indent; z++) {
+            System.out.print(indentString);
+        }
+    }
+
+    @Override
+	public void visit(ArrayType node) throws ASTVisitorException {
+		System.out.print("HELLO");
 	}
 
-	@Override
-	public void visit(EmptyStatement node) throws ASTVisitorException {
-		System.out.println(";");
-	}
-
-	@Override
-	public void visit(FunctionCallStatement node) throws ASTVisitorException {
-        System.out.print(node.getIdentifier());
-        System.out.print("(");
-        node.getExpression().accept(this);
-        for(Expression e: node.getExpressions()) {
-            System.out.print(", ");
-            e.accept(this);
-        }
-        System.out.println(");");
-	}
-
-	@Override
-	public void visit(IfElseStatement node) throws ASTVisitorException {
-		System.out.print("if ");
-        for (int i = 0; i < node.getCondition().size(); i++) {
-            node.getCondition().get(i).accept(this);
-            if (i < node.getCondition().size() - 1) {
-                System.out.print(" && ");
-            }
-        }
-        System.out.println(" then ");
-        System.out.print("\t");
-        node.getStatement1().accept(this);
-        System.out.println(" else ");
-        System.out.print("\t");
-        node.getStatement2().accept(this);
-	}
-    
-	@Override
-	public void visit(ReturnStatement node) throws ASTVisitorException {
-		System.out.print("return ");
-        if (node.getExpression() != null) {
-            node.getExpression().accept(this);
-            System.out.println(";");
-        } else {
-            System.out.println(";");
-        }
-	}
-
-	@Override
+    @Override
 	public void visit(VariableDefinition node) throws ASTVisitorException {
-		System.out.print("var ");
+		for (int z = 0; z < indent-1; z++) {
+            System.out.print(indentString);
+        }
+        System.out.print("var ");
         for(String id: node.getIdentifiers()) {
             System.out.print(id);
             if (id != node.getIdentifiers().get(node.getIdentifiers().size() - 1)) {
@@ -284,9 +140,140 @@ public class PrintASTVisitor implements ASTVisitor {
         System.out.println(";");
 	}
 
+    @Override
+	public void visit(EmptyStatement node) throws ASTVisitorException {
+		System.out.println(";");
+	}
+
+    @Override
+    public void visit(SpacerStatement node) throws ASTVisitorException {
+        if (node.getExpression1() != null) {
+            node.getExpression1().accept(this);
+        } else {
+            System.out.print(node.getIdentifier());
+        }
+        System.out.print(" <- ");
+        if (node.getExpression2() != null) {
+            node.getExpression2().accept(this);
+        }
+        System.out.println(";");
+    }
+
+    @Override
+	public void visit(FunctionCallStatement node) throws ASTVisitorException {
+        node.getExpression().accept(this);
+        System.out.println(";");
+	}
+
+    @Override
+	public void visit(FunctionCallExpression node) throws ASTVisitorException {
+		System.out.print(node.getIdentifier());
+        System.out.print("(");
+        node.getExpression().accept(this);
+        for(Expression e: node.getExpressions()) {
+            System.out.print(", ");
+            e.accept(this);
+        }
+        System.out.print(")");
+	}
+
+    @Override
+	public void visit(PutsStatement node) throws ASTVisitorException {
+		System.out.print("puts(");
+        node.getExpression().accept(this);
+        System.out.println(");");
+	}
+
+    @Override
+	public void visit(IfStatement node) throws ASTVisitorException {
+		System.out.print("if ");
+        for (int i = 0; i < node.getCondition().size(); i++) {
+            node.getCondition().get(i).accept(this);
+            if (i < node.getCondition().size() - 1) {
+                System.out.print(" && ");
+            }
+        }
+        System.out.println(" then {");
+        node.getStatement().accept(this);
+        indent--;
+        System.out.println("}");
+	}
+
 	@Override
+	public void visit(IfElseStatement node) throws ASTVisitorException {
+		System.out.print("if ");
+        for (int i = 0; i < node.getCondition().size(); i++) {
+            node.getCondition().get(i).accept(this);
+            if (i < node.getCondition().size() - 1) {
+                System.out.print(" && ");
+            }
+        }
+        System.out.println(" then {");
+        indent++;
+        for (int z = 0; z < indent; z++) {
+            System.out.print(indentString);
+        }
+        indent--;
+        node.getStatement1().accept(this);
+        for (int z = 0; z < indent; z++) {
+            System.out.print(indentString);
+        }
+        System.out.println("} else {");
+        indent++;
+        for (int z = 0; z < indent; z++) {
+            System.out.print(indentString);
+        }
+        indent--;
+        node.getStatement2().accept(this);
+        System.out.println("}");
+	}
+
+    @Override
+    public void visit(WhileStatement node) throws ASTVisitorException {
+        System.out.print("while (");
+        for (int i = 0; i < node.getCondition().size(); i++) {
+            node.getCondition().get(i).accept(this);
+            if (i < node.getCondition().size() - 1) {
+                System.out.print(" && ");
+            }
+        }
+        System.out.println(") do {");
+        indent++;
+        for (int z = 0; z < indent; z++) {
+            System.out.print(indentString);
+        }
+        indent--;
+        node.getStatement().accept(this);
+        System.out.println("}");
+    }
+
+    //OKOKOKOKOK
+    @Override
+	public void visit(ReturnStatement node) throws ASTVisitorException {
+		System.out.print("return ");
+        if (node.getExpression() != null) {
+            node.getExpression().accept(this);
+            System.out.println(";");
+        } else {
+            System.out.println(";");
+        }
+	}
+
+    @Override
+    public void visit(IdentifierExpression node) throws ASTVisitorException {
+        System.out.print(node.getIdentifier());
+    }
+
+    @Override
+    public void visit(StringLiteralExpression node) throws ASTVisitorException {
+        System.out.print("\"");
+        System.out.print(StringEscapeUtils.escapeJava(node.getLiteral()));
+        System.out.print("\"");
+    }
+
+    @Override
 	public void visit(LValueExpression node) throws ASTVisitorException {
-        System.out.print(node.getExpression1());
+        node.getExpression1().accept(this);
         System.out.print("[");
         if (node.getExpression2() != null) {
             node.getExpression2().accept(this);
@@ -294,36 +281,67 @@ public class PrintASTVisitor implements ASTVisitor {
         System.out.print("]");
 	}
 
-	@Override
-	public void visit(BlockStatement node) throws ASTVisitorException {
-		System.out.println("{ ");
-        for(Statement st: node.getStatements()) {
-            st.accept(this);
-        }
-        System.out.println("}");
+    @Override
+    public void visit(IntegerLiteralExpression node) throws ASTVisitorException {
+        System.out.print(node.getLiteral());
+    }
+
+    @Override
+	public void visit(CharLiteralExpression node) throws ASTVisitorException {
+        System.out.print(StringEscapeUtils.escapeJava(node.getLiteral()));
+	}
+
+    @Override
+    public void visit(ParenthesisExpression node) throws ASTVisitorException {
+        System.out.print("(");
+        node.getExpression().accept(this);
+        System.out.print(")");
+    }
+
+    @Override
+    public void visit(UnaryExpression node) throws ASTVisitorException {
+        System.out.print(node.getOperator());
+        System.out.print(" ");
+        node.getExpression().accept(this);
+    }
+
+    @Override
+    public void visit(BinaryExpression node) throws ASTVisitorException {
+        node.getExpression1().accept(this);
+        System.out.print(" ");
+        System.out.print(node.getOperator());
+        System.out.print(" ");
+        node.getExpression2().accept(this);
+    }
+
+    @Override
+    public void visit(ParenthesisCondition node) throws ASTVisitorException {
+        System.out.print("(");
+        node.getCondition().accept(this);
+        System.out.print(")");
+    }
+
+    @Override
+	public void visit(UnaryCondition node) throws ASTVisitorException {
+		System.out.print(node.getOperator());
+        System.out.print(" ");
+        node.getCondition().accept(this);
 	}
 
 	@Override
-	public void visit(LocalDefinition node) throws ASTVisitorException {
-		if (node.getDefinitions().size() > 0) {
-            for (Definition d: node.getDefinitions()) {
-                d.accept(this);
-            }
+	public void visit(BinaryCondition node) throws ASTVisitorException {
+		if (node.getCondition1() != null) {
+            node.getCondition1().accept(this);
+        } else {
+            node.getExpression1().accept(this);
         }
-	}
-
-	@Override
-	public void visit(FunctionDefinition node) throws ASTVisitorException {
-		node.getHeader().accept(this);
-        for (Definition d: node.getDefinitions()) {
-            System.out.print("\t");
-            d.accept(this);
+        System.out.print(" ");
+        System.out.print(node.getOperator());
+        System.out.print(" ");
+        if (node.getCondition2() != null) {
+            node.getCondition2().accept(this);
+        } else {
+            node.getExpression2().accept(this);
         }
-        node.getBlock().accept(this);
-	}
-
-	@Override
-	public void visit(ArrayType node) throws ASTVisitorException {
-		System.out.println(node.getArrayType());
 	}
 }

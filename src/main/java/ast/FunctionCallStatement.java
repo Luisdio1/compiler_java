@@ -1,27 +1,11 @@
 package ast;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 public class FunctionCallStatement extends Statement {
 
-    private String identifier;
     private Expression expression;
-    private List<Expression> expressions;
 
-    public FunctionCallStatement(String identifier, Expression expression, List<Expression> expressions) {
-        this.identifier = identifier;
+    public FunctionCallStatement(Expression expression) {
         this.expression = expression;
-        this.expressions = expressions;
-    }
-
-    public String getIdentifier() {
-        return identifier;
-    }
-
-    public void setIdentifier(String identifer) {
-        this.identifier = identifer;
     }
 
     public Expression getExpression() {
@@ -30,16 +14,6 @@ public class FunctionCallStatement extends Statement {
 
     public void setExpression(Expression expression) {
         this.expression = expression;
-    }
-
-    public List<Expression> getExpressions() {
-        List<Expression> reversedExpressions = new ArrayList<>(expressions);
-        Collections.reverse(reversedExpressions);
-        return reversedExpressions;
-    }
-
-    public void setExpression(List<Expression> expressions) {
-        this.expressions = expressions;
     }
 
     @Override

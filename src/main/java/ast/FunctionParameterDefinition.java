@@ -1,5 +1,7 @@
 package ast;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class FunctionParameterDefinition extends Definition {
@@ -23,7 +25,9 @@ public class FunctionParameterDefinition extends Definition {
     }
     
     public List<String> getIdentifiers() {
-        return identifiers;
+        List<String> reversedIdentifiers = new ArrayList<>(identifiers);
+        Collections.reverse(reversedIdentifiers);
+        return reversedIdentifiers;
     }
 
     public void setIdentifiers(List<String> identifiers) {
