@@ -41,12 +41,12 @@ public class Compiler {
 				    Registry.getInstance().setRoot(program);
                     
                     // build symbol table
-				    LOGGER.debug("Building symbol tables");
-				    program.accept(new SymTableBuilderASTVisitor());
+				    // LOGGER.debug("Building symbol tables");
+				    // program.accept(new SymTableBuilderASTVisitor());
                     
                     // construct types
-				    LOGGER.debug("Semantic check (1st pass)");
-				    program.accept(new CollectSymbolsASTVisitor());
+				    // LOGGER.debug("Semantic check (1st pass)");
+				    // program.accept(new CollectSymbolsASTVisitor());
 				    // LOGGER.debug("Semantic check (2nd pass)");
 				    // program.accept(new CollectTypesASTVisitor());                  
                     
@@ -56,8 +56,8 @@ public class Compiler {
                     program.accept(printVisitor);
 
                     // build symbol table
-                    ASTVisitor symTableVisitor = new SymTableBuilderASTVisitor();
-                    program.accept(symTableVisitor);
+                    // ASTVisitor symTableVisitor = new SymTableBuilderASTVisitor();
+                    // program.accept(symTableVisitor);
                     
                     LOGGER.info("Compilation done");
                 } catch (java.io.FileNotFoundException e) {

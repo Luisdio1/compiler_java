@@ -53,11 +53,10 @@ public class PrintASTVisitor implements ASTVisitor {
         indent--;
         printIdentation();
         System.out.println("{");
-        node.getBlock().accept(this);
-        System.out.println("}");
         indent++;
-        printIdentation();
+        node.getBlock().accept(this);
         indent--;
+        System.out.println("}");
 	}
 
     @Override
@@ -92,13 +91,12 @@ public class PrintASTVisitor implements ASTVisitor {
 
     @Override
     public void visit(StatementGroup node) throws ASTVisitorException {
-        indent++;
         for(Statement st: node.getStatements()) { 
-            printIdentation();
             st.accept(this);
         }
         indent--;
         printIdentation();
+        indent++;
     }
 
     @Override
@@ -135,6 +133,7 @@ public class PrintASTVisitor implements ASTVisitor {
 
     @Override
     public void visit(SpacerStatement node) throws ASTVisitorException {
+        printIdentation();
         if (node.getExpression1() != null) {
             node.getExpression1().accept(this);
         } else {
@@ -149,6 +148,7 @@ public class PrintASTVisitor implements ASTVisitor {
 
     @Override
 	public void visit(FunctionCallStatement node) throws ASTVisitorException {
+        printIdentation();
         node.getExpression().accept(this);
         System.out.println(";");
 	}
@@ -167,14 +167,16 @@ public class PrintASTVisitor implements ASTVisitor {
 
     @Override
 	public void visit(PutsStatement node) throws ASTVisitorException {
-		System.out.print("puts(");
+		printIdentation();
+        System.out.print("puts(");
         node.getExpression().accept(this);
         System.out.println(");");
 	}
 
     @Override
 	public void visit(IfStatement node) throws ASTVisitorException {
-		System.out.print("if ");
+		printIdentation();
+        System.out.print("if ");
         for (int i = 0; i < node.getCondition().size(); i++) {
             node.getCondition().get(i).accept(this);
             if (i < node.getCondition().size() - 1) {
@@ -182,6 +184,7 @@ public class PrintASTVisitor implements ASTVisitor {
             }
         }
         System.out.println(" then {");
+        indent++;
         node.getStatement().accept(this);
         indent--;
         System.out.println("}");
@@ -189,7 +192,8 @@ public class PrintASTVisitor implements ASTVisitor {
 
 	@Override
 	public void visit(IfElseStatement node) throws ASTVisitorException {
-		System.out.print("if ");
+		printIdentation();
+        System.out.print("if ");
         for (int i = 0; i < node.getCondition().size(); i++) {
             node.getCondition().get(i).accept(this);
             if (i < node.getCondition().size() - 1) {
@@ -198,20 +202,24 @@ public class PrintASTVisitor implements ASTVisitor {
         }
         System.out.println(" then {");
         indent++;
-        printIdentation();
-        indent--;
         node.getStatement1().accept(this);
-        printIdentation();
-        System.out.println("} else {");
-        indent++;
-        printIdentation();
         indent--;
-        node.getStatement2().accept(this);
-        System.out.println("}");
+        printIdentation();
+        indent++;
+        if (node.getStatement2().getClass() == IfElseStatement.class) {
+            indent--;
+            System.out.print("} else ");
+            node.getStatement2().accept(this);
+        } else {
+            System.out.println("} else {");
+            node.getStatement2().accept(this);
+            System.out.println("}");
+        }
 	}
 
     @Override
     public void visit(WhileStatement node) throws ASTVisitorException {
+        printIdentation();
         System.out.print("while (");
         for (int i = 0; i < node.getCondition().size(); i++) {
             node.getCondition().get(i).accept(this);
@@ -221,15 +229,15 @@ public class PrintASTVisitor implements ASTVisitor {
         }
         System.out.println(") do {");
         indent++;
-        printIdentation();
-        indent--;
         node.getStatement().accept(this);
+        indent--;
         System.out.println("}");
     }
 
     @Override
 	public void visit(ReturnStatement node) throws ASTVisitorException {
-		System.out.print("return ");
+		printIdentation();
+        System.out.print("return ");
         if (node.getExpression() != null) {
             node.getExpression().accept(this);
             System.out.println(";");
