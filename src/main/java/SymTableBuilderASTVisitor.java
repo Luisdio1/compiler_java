@@ -59,6 +59,7 @@ public class SymTableBuilderASTVisitor implements ASTVisitor {
 	@Override
 	public void visit(SpacerStatement node) throws ASTVisitorException {
 		ASTUtils.setSymbolTable(node, stack.element());
+		node.getExpression1().accept(this);
 		node.getExpression2().accept(this);
 	}
 
@@ -205,7 +206,9 @@ public class SymTableBuilderASTVisitor implements ASTVisitor {
 	@Override
 	public void visit(ReturnStatement node) throws ASTVisitorException {
 		ASTUtils.setSymbolTable(node, stack.element());
-        node.getExpression().accept(this);
+        if (node.getExpression() != null) {
+			node.getExpression().accept(this);
+		}
 	}
 
 	@Override
@@ -216,6 +219,8 @@ public class SymTableBuilderASTVisitor implements ASTVisitor {
 	@Override
 	public void visit(LValueExpression node) throws ASTVisitorException {
 		ASTUtils.setSymbolTable(node, stack.element());
+		node.getExpression1().accept(this);
+		node.getExpression2().accept(this);
 	}
 
 	@Override
@@ -229,6 +234,7 @@ public class SymTableBuilderASTVisitor implements ASTVisitor {
 	@Override
 	public void visit(ArrayType node) throws ASTVisitorException {
 		ASTUtils.setSymbolTable(node, stack.element());
+		// STH TO DO?
 	}
 
 	@Override

@@ -11,6 +11,7 @@ import ast.IfElseStatement;
 import ast.IfStatement;
 import ast.IntegerLiteralExpression;
 import ast.LValueExpression;
+import ast.Operator;
 import ast.CharLiteralExpression;
 import ast.Definition;
 import ast.EmptyStatement;
@@ -49,6 +50,15 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
 
 	@Override
 	public void visit(SpacerStatement node) throws ASTVisitorException {
+		SymbolTable<Info> symbolTable = ASTUtils.getSafeSymbolTable(node);
+		String lvalue = node.getExpression1().toString();
+		if (symbolTable.innerScopeLookup(lvalue) != null) {
+			ASTUtils.error(node, "LValue " + lvalue + " already defined");
+		} else {
+			System.out.println("Adding LValue " + lvalue + " to symbol table");
+			symbolTable.put(lvalue, new Info(lvalue, Type.INT_TYPE));
+		}
+		node.getExpression1().accept(this);
 		node.getExpression2().accept(this);
 	}
 
@@ -92,13 +102,24 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
 
 	@Override
 	public void visit(BinaryCondition node) throws ASTVisitorException {
-		node.getExpression1().accept(this);
-		node.getExpression2().accept(this);
+		if (node.getOperator() == Operator.AND || node.getOperator() == Operator.OR) {
+			node.getCondition1().accept(this);
+			node.getCondition2().accept(this);
+		} else {
+			node.getExpression1().accept(this);
+			node.getExpression2().accept(this);
+		}
+		//NOT SURE
 	}
 
 	@Override
 	public void visit(UnaryCondition node) throws ASTVisitorException {
-		node.getExpression().accept(this);
+		if (node.getOperator() == Operator.NOT) {
+			node.getCondition().accept(this);
+		} else {
+			node.getExpression().accept(this);
+		}
+		// NOT SURE
 	}
 
 	@Override
@@ -114,6 +135,7 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
 	@Override
 	public void visit(WhileStatement node) throws ASTVisitorException {
 		node.getCondition().accept(this);
+		node.getStatement().accept(this);
 	}
 
 	@Override
@@ -173,7 +195,9 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
 
 	@Override
 	public void visit(ReturnStatement node) throws ASTVisitorException {
-		node.getExpression().accept(this);
+		if (node.getExpression() != null) {
+			node.getExpression().accept(this);
+		}
 	}
 
 	@Override
@@ -190,13 +214,13 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
             	symbolTable.put(id, new Info(id, type));
 			}
         }
-
 		// System.out.println(symbolTable.getSymbols());
 	}
 
 	@Override
 	public void visit(LValueExpression node) throws ASTVisitorException {
-		// Nothing
+		node.getExpression1().accept(this);
+		node.getExpression2().accept(this);
 	}
 
 	@Override
@@ -224,6 +248,7 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
 
 	@Override
 	public void visit(FunctionCallExpression node) throws ASTVisitorException {
+		node.getExpression().accept(this);
 		for (Expression e: node.getExpressions()) {
             e.accept(this);
         }

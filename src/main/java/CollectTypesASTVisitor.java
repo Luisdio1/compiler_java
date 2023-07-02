@@ -61,12 +61,15 @@ public class CollectTypesASTVisitor implements ASTVisitor {
 				ASTUtils.error(node, "Identifier " + node.getIdentifier() + " not declared.");
 			}
 			leftType = idInfo.getType();
-		} else {
+		} else if (node.getExpression1() != null) {
 			Info expInfo = symbolTable.lookup(node.getExpression1().toString());
 			if (expInfo == null) {
-				ASTUtils.error(node, "Identifier " + node.getExpression1().toString() + " not declared.");
+				ASTUtils.error(node, "Expression " + node.getExpression1().toString() + " not declared.");
 			}
 			leftType = expInfo.getType();
+		} else {
+			ASTUtils.error(node, "Invalid SpacerStatement");
+			return;
 		}
 		node.getExpression2().accept(this);
 		Type rightType = ASTUtils.getSafeType(node.getExpression2());
@@ -142,15 +145,28 @@ public class CollectTypesASTVisitor implements ASTVisitor {
 
 	@Override
 	public void visit(BinaryCondition node) throws ASTVisitorException {
+		Type type1, type2;
 		if (node.getExpression1() != null) {
 			node.getExpression1().accept(this);
+			type1 = ASTUtils.getSafeType(node.getExpression1());
 		} else {
 			node.getCondition1().accept(this);
+			type1 = ASTUtils.getSafeType(node.getCondition1());
 		}
 		if (node.getExpression2() != null) {
 			node.getExpression2().accept(this);
+			type2 = ASTUtils.getSafeType(node.getExpression2());
 		} else {
 			node.getCondition2().accept(this);
+			type2 = ASTUtils.getSafeType(node.getCondition2());
+		}
+
+		Operator operator = node.getOperator();
+		try {
+			Type resultType = TypeUtils.applyBinary(operator, type1, type2);
+			ASTUtils.setType(node, resultType);
+		} catch (TypeException e) {
+			ASTUtils.error(node, e.getMessage());
 		}
 		//TODO
 	}

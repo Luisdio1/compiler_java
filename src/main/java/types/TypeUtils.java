@@ -136,7 +136,8 @@ public class TypeUtils {
 			}
 		} else if (op.equals(Operator.PLUS)) {
 			return maxType(t1, t2);
-		} else if (op.equals(Operator.MINUS) || op.equals(Operator.DIV) || op.equals(Operator.TIMES)) {
+		} else if (op.equals(Operator.MINUS) || op.equals(Operator.DIV) 
+					|| op.equals(Operator.TIMES) || op.equals(Operator.MOD)) {
 			if (t1.equals(TypeUtils.STRING_TYPE) || t2.equals(TypeUtils.STRING_TYPE)) {
 				throw new TypeException("Expressions cannot be handled as numbers");
 			}
