@@ -1,8 +1,3 @@
-/**
- *  This code is part of the lab exercises for the Compilers course
- *  at Harokopio University of Athens, Dept. of Informatics and Telematics.
- */
-
 import static java.lang.System.out;
 import java_cup.runtime.Symbol;
 
@@ -40,14 +35,6 @@ SingleComment  = "\\\$" [^$] {LineTerminator}?
 
 Identifier     = [:jletter:] [:jletterdigit:]*
 IntegerLiteral = 0 | [1-9][0-9]*
-
-// Exponent       = [eE][\+\-]?[0-9]+
-// Float1         = [0-9]+ \. [0-9]+ {Exponent}?
-// Float2         = \. [0-9]+ {Exponent}?
-// Float3         = [0-9]+ \. {Exponent}?
-// Float4         = [0-9]+ {Exponent}
-// FloatLiteral   = {Float1} | {Float2} | {Float3} | {Float4}
-
 CharLiteral    = \'(\\.|[^\n'\\])\'? 
 
 %state STRING
@@ -58,83 +45,82 @@ CharLiteral    = \'(\\.|[^\n'\\])\'?
 
 <YYINITIAL> {
     /* reserved keywords */
-    "and"                          { return createSymbol(sym.AND); }
-    "puts"                         { return createSymbol(sym.PUTS); }
-    "char"                         { return createSymbol(sym.CHAR); }
-    "div"                          { return createSymbol(sym.DIV); }
-    "do"                           { return createSymbol(sym.DO); }
-    "else"                         { return createSymbol(sym.ELSE); }
-    "fun"                          { return createSymbol(sym.FUN); }
-    "if"                           { return createSymbol(sym.IF); }
-    "int"                          { return createSymbol(sym.INT); }
-    "mod"                          { return createSymbol(sym.MOD); }
-    "not"                          { return createSymbol(sym.NOT); }
-    "nothing"                      { return createSymbol(sym.NOTHING); }
-    "or"                           { return createSymbol(sym.OR); }
-    "ref"                          { return createSymbol(sym.REF); }
-    "return"                       { return createSymbol(sym.RETURN); }
-    "then"                         { return createSymbol(sym.THEN); }
-    "var"                          { return createSymbol(sym.VAR); }
-    "while"                        { return createSymbol(sym.WHILE); }
+    "and"                 { return createSymbol(sym.AND); }
+    "puts"                { return createSymbol(sym.PUTS); }
+    "char"                { return createSymbol(sym.CHAR); }
+    "div"                 { return createSymbol(sym.DIV); }
+    "do"                  { return createSymbol(sym.DO); }
+    "else"                { return createSymbol(sym.ELSE); }
+    "fun"                 { return createSymbol(sym.FUN); }
+    "if"                  { return createSymbol(sym.IF); }
+    "int"                 { return createSymbol(sym.INT); }
+    "mod"                 { return createSymbol(sym.MOD); }
+    "not"                 { return createSymbol(sym.NOT); }
+    "nothing"             { return createSymbol(sym.NOTHING); }
+    "or"                  { return createSymbol(sym.OR); }
+    "ref"                 { return createSymbol(sym.REF); }
+    "return"              { return createSymbol(sym.RETURN); }
+    "then"                { return createSymbol(sym.THEN); }
+    "var"                 { return createSymbol(sym.VAR); }
+    "while"               { return createSymbol(sym.WHILE); }
 
     /* identifiers */ 
-    {Identifier}                   { return createSymbol(sym.IDENTIFIER, yytext()); }
-    {IntegerLiteral}               { return createSymbol(sym.INTEGER_LITERAL, Integer.valueOf(yytext())); }
+    {Identifier}          { return createSymbol(sym.IDENTIFIER, yytext()); }
+    {IntegerLiteral}      { return createSymbol(sym.INTEGER_LITERAL, Integer.valueOf(yytext())); }
 
-    \"                             { sb.setLength(0); yybegin(STRING); }
-    \\\$\\\$                       { yybegin(COMMENT); }
-    \\\$                           { yybegin(SINGLE_COMMENT); }
+    \"                    { sb.setLength(0); yybegin(STRING); }
+    \\\$\\\$              { yybegin(COMMENT); }
+    \\\$                  { yybegin(SINGLE_COMMENT); }
 
     /* operators */
-    "="                            { return createSymbol(sym.EQ); }
-    "+"                            { return createSymbol(sym.PLUS); }
-    "-"                            { return createSymbol(sym.MINUS); }
-    "*"                            { return createSymbol(sym.TIMES); }
-    "("                            { return createSymbol(sym.LPAREN); }
-    ")"                            { return createSymbol(sym.RPAREN); }
-    ";"                            { return createSymbol(sym.SEMICOLON); }
-   
-    ":"                            { return createSymbol(sym.COLON); }
-    "{"                            { return createSymbol(sym.LCURLY); }
-    "}"                            { return createSymbol(sym.RCURLY); }
-    "["                            { return createSymbol(sym.LBRACKET); }
-    "]"                            { return createSymbol(sym.RBRACKET); }
-    "<-"                           { return createSymbol(sym.SPACER); }
-    "<="                           { return createSymbol(sym.LEQ); }
-    ">="                           { return createSymbol(sym.GEQ); }
-    "#"                            { return createSymbol(sym.NEQ); }
-    "<"                            { return createSymbol(sym.LTHAN); }
-    ">"                            { return createSymbol(sym.GTHAN); }
-    ","                            { return createSymbol(sym.COMMA); }
-    {CharLiteral}                  { return createSymbol(sym.CHAR_LITERAL, yytext()); }
+    "="                   { return createSymbol(sym.EQ); }
+    "+"                   { return createSymbol(sym.PLUS); }
+    "-"                   { return createSymbol(sym.MINUS); }
+    "*"                   { return createSymbol(sym.TIMES); }
+    "("                   { return createSymbol(sym.LPAREN); }
+    ")"                   { return createSymbol(sym.RPAREN); }
+    ";"                   { return createSymbol(sym.SEMICOLON); }
+    ":"                   { return createSymbol(sym.COLON); }
+    "{"                   { return createSymbol(sym.LCURLY); }
+    "}"                   { return createSymbol(sym.RCURLY); }
+    "["                   { return createSymbol(sym.LBRACKET); }
+    "]"                   { return createSymbol(sym.RBRACKET); }
+    "<-"                  { return createSymbol(sym.SPACER); }
+    "<="                  { return createSymbol(sym.LEQ); }
+    ">="                  { return createSymbol(sym.GEQ); }
+    "#"                   { return createSymbol(sym.NEQ); }
+    "<"                   { return createSymbol(sym.LTHAN); }
+    ">"                   { return createSymbol(sym.GTHAN); }
+    ","                   { return createSymbol(sym.COMMA); }
+    {CharLiteral}         { return createSymbol(sym.CHAR_LITERAL, yytext()); }
 
     /* whitespace */
-    {WhiteSpace}                   { /* ignore */ }
+    {WhiteSpace}          { /* ignore */ }
 }
 
 <STRING> {
-    \"                             { yybegin(YYINITIAL);
-                                     return createSymbol(sym.STRING_LITERAL, sb.toString());
-                                   }
+    \"                    { yybegin(YYINITIAL);
+                            return createSymbol(sym.STRING_LITERAL, sb.toString());
+                          }
 
-    [^\n\r\"\\]+                   { sb.append(yytext()); }
-    \\t                            { sb.append('\t'); }
-    \\n                            { sb.append('\n'); }
+    [^\n\r\"\\]+          { sb.append(yytext()); }
+    \\t                   { sb.append('\t'); }
+    \\n                   { sb.append('\n'); }
 
-    \\r                            { sb.append('\r'); }
-    \\\"                           { sb.append('\"'); }
-    \\                             { sb.append('\\'); }
+    \\r                   { sb.append('\r'); }
+    \\\"                  { sb.append('\"'); }
+    \\                    { sb.append('\\'); }
 }
 
 <COMMENT> {
-    {Comment}                      { /* ignore */ }
+    {Comment}             { /* ignore */ }
 
 }
 
 <SINGLE_COMMENT> {
-    {SingleComment}                { /* ignore */ }
+    {SingleComment}       { /* ignore */ }
 
 }
 
 /* error fallback */
-[^]                                { throw new RuntimeException((yyline+1) + ":" + (yycolumn+1) + ": illegal character <"+ yytext()+">"); }
+[^]                       { throw new RuntimeException((yyline+1) + ":" + (yycolumn+1) + ": illegal character <"+ yytext()+">"); }
