@@ -137,12 +137,13 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
 
         for (String id : identifier) {
             if (symbolTable.innerScopeLookup(id) != null) {
-                ASTUtils.error(node, "Variable " + id + " already defined");
+                ASTUtils.error(node, "Parameter " + id + " already defined");
             } else {
-				System.out.println("Adding variable " + id + " to symbol table");
+				System.out.println("Adding parameter " + id + " to symbol table");
             	symbolTable.put(id, new Info(id, type));
 			}
         }
+		System.out.println(symbolTable.getSymbols());
 	}
 
 	@Override
@@ -187,6 +188,8 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
             	symbolTable.put(id, new Info(id, type));
 			}
         }
+
+		System.out.println(symbolTable.getSymbols());
 	}
 
 	@Override
@@ -204,10 +207,12 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
         ast.Type type = node.getType();
 
         if (symbolTable.innerScopeLookup(identifier) != null) {
-            ASTUtils.error(node, "Variable " + identifier + " already defined");
-        }
-        symbolTable.put(identifier, new Info(identifier, type));
-
+            ASTUtils.error(node, "Function " + identifier + " already defined");
+        } else {
+			System.out.println("Adding function " + identifier + " to symbol table");
+			symbolTable.put(identifier, new Info(identifier, type));
+		}
+		System.out.println(symbolTable.getSymbols());
 	}
 
 	@Override
