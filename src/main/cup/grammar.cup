@@ -102,7 +102,6 @@ non terminal List<Integer> arrays;
 non terminal Expression expr;
 non terminal List<Expression> exprs;
 non terminal Condition cond;
-non terminal List<Condition> conds;
 
 precedence left OR;
 precedence left AND;
@@ -295,21 +294,21 @@ stmt ::= SEMICOLON:s
             RESULT.setLine(pleft);
             RESULT.setColumn(pright);
          :}
-       | IF:i conds:cs THEN stmt:s 
+       | IF:i cond:c THEN stmt:s 
          {:
-            RESULT = new IfStatement(cs, s);
+            RESULT = new IfStatement(c, s);
             RESULT.setLine(ileft);
             RESULT.setColumn(iright);
          :}
-       | IF:i conds:cs THEN stmt:s1 ELSE stmt:s2
+       | IF:i cond:c THEN stmt:s1 ELSE stmt:s2
          {:
-            RESULT = new IfElseStatement(cs, s1, s2);
+            RESULT = new IfElseStatement(c, s1, s2);
             RESULT.setLine(ileft);
             RESULT.setColumn(iright);
          :}
-       | WHILE:w conds:cs DO stmt:s
+       | WHILE:w cond:c DO stmt:s
          {:
-            RESULT = new WhileStatement(cs, s);
+            RESULT = new WhileStatement(c, s);
             RESULT.setLine(wleft);
             RESULT.setColumn(wright);
          :}
@@ -446,17 +445,6 @@ expr ::= INTEGER_LITERAL:l
              RESULT.setColumn(e1right);
          :}
        ;
-
-conds ::= cond:c conds:cs
-        {:
-            cs.add(c);
-            RESULT = cs;
-        :}
-        | /* empty */
-        {:
-            RESULT = new ArrayList<Condition>();
-        :}
-        ;
 
 cond ::= LPAREN:lp cond:c RPAREN
          {:

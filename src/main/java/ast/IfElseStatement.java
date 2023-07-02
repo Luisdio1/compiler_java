@@ -1,29 +1,23 @@
 package ast;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 public class IfElseStatement extends Statement {
 
-    private List<Condition> conditions;
+    private Condition condition;
     private Statement statement1;
     private Statement statement2;
 
-    public IfElseStatement(List<Condition> conditions, Statement statement1, Statement statement2) {
-        this.conditions = conditions;
+    public IfElseStatement(Condition condition, Statement statement1, Statement statement2) {
+        this.condition = condition;
         this.statement1 = statement1;
         this.statement2 = statement2;
     }
 
-    public List<Condition> getCondition() {
-        List<Condition> reversedConditions = new ArrayList<>(conditions);
-        Collections.reverse(reversedConditions);
-        return reversedConditions;
+    public Condition getCondition() {
+        return condition;
     }
 
-    public void setCondition(List<Condition> conditions) {
-        this.conditions = conditions;
+    public void setCondition(Condition condition) {
+        this.condition = condition;
     }
 
     public Statement getStatement1() {

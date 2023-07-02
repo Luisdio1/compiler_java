@@ -177,12 +177,7 @@ public class PrintASTVisitor implements ASTVisitor {
 	public void visit(IfStatement node) throws ASTVisitorException {
 		printIdentation();
         System.out.print("if ");
-        for (int i = 0; i < node.getCondition().size(); i++) {
-            node.getCondition().get(i).accept(this);
-            if (i < node.getCondition().size() - 1) {
-                System.out.print(" && ");
-            }
-        }
+        node.getCondition().accept(this);
         System.out.println(" then {");
         indent++;
         node.getStatement().accept(this);
@@ -194,12 +189,7 @@ public class PrintASTVisitor implements ASTVisitor {
 	public void visit(IfElseStatement node) throws ASTVisitorException {
 		printIdentation();
         System.out.print("if ");
-        for (int i = 0; i < node.getCondition().size(); i++) {
-            node.getCondition().get(i).accept(this);
-            if (i < node.getCondition().size() - 1) {
-                System.out.print(" && ");
-            }
-        }
+        node.getCondition().accept(this);
         System.out.println(" then {");
         indent++;
         node.getStatement1().accept(this);
@@ -221,12 +211,7 @@ public class PrintASTVisitor implements ASTVisitor {
     public void visit(WhileStatement node) throws ASTVisitorException {
         printIdentation();
         System.out.print("while (");
-        for (int i = 0; i < node.getCondition().size(); i++) {
-            node.getCondition().get(i).accept(this);
-            if (i < node.getCondition().size() - 1) {
-                System.out.print(" && ");
-            }
-        }
+        node.getCondition().accept(this);
         System.out.println(") do {");
         indent++;
         node.getStatement().accept(this);
@@ -312,23 +297,23 @@ public class PrintASTVisitor implements ASTVisitor {
 	public void visit(UnaryCondition node) throws ASTVisitorException {
 		System.out.print(node.getOperator());
         System.out.print(" ");
-        node.getCondition().accept(this);
+        node.getExpression().accept(this);
 	}
 
 	@Override
 	public void visit(BinaryCondition node) throws ASTVisitorException {
-		if (node.getCondition1() != null) {
-            node.getCondition1().accept(this);
-        } else {
+        if (node.getExpression1() != null) {
             node.getExpression1().accept(this);
+        } else {
+            node.getCondition1().accept(this);
         }
         System.out.print(" ");
         System.out.print(node.getOperator());
         System.out.print(" ");
-        if (node.getCondition2() != null) {
-            node.getCondition2().accept(this);
-        } else {
+        if (node.getExpression2() != null) {
             node.getExpression2().accept(this);
+        } else {
+            node.getCondition2().accept(this);
         }
 	}
 

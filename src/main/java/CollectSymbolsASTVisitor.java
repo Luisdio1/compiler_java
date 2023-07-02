@@ -12,7 +12,6 @@ import ast.IfStatement;
 import ast.IntegerLiteralExpression;
 import ast.LValueExpression;
 import ast.CharLiteralExpression;
-import ast.Condition;
 import ast.Definition;
 import ast.EmptyStatement;
 import ast.Expression;
@@ -98,7 +97,7 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
 
 	@Override
 	public void visit(UnaryCondition node) throws ASTVisitorException {
-		node.getCondition().accept(this);
+		node.getExpression().accept(this);
 	}
 
 	@Override
@@ -113,9 +112,7 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
 
 	@Override
 	public void visit(WhileStatement node) throws ASTVisitorException {
-		for (Condition c: node.getCondition()) {
-            c.accept(this);
-        }
+		node.getCondition().accept(this);
 	}
 
 	@Override
@@ -125,7 +122,11 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
 
 	@Override
 	public void visit(FunctionDefinition node) throws ASTVisitorException {
-		// Nothing???
+		node.getHeader().accept(this);
+		for (int i = 0; i < node.getDefinitions().size(); i++) {
+            node.getDefinitions().get(i).accept(this);
+        }
+		node.getBlock().accept(this);
 	}
 
 	@Override
@@ -137,16 +138,16 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
         for (String id : identifier) {
             if (symbolTable.innerScopeLookup(id) != null) {
                 ASTUtils.error(node, "Variable " + id + " already defined");
-            }
-            symbolTable.put(id, new Info(id, type));
+            } else {
+				System.out.println("Adding variable " + id + " to symbol table");
+            	symbolTable.put(id, new Info(id, type));
+			}
         }
 	}
 
 	@Override
 	public void visit(IfStatement node) throws ASTVisitorException {
-		for (Condition c: node.getCondition()) {
-            c.accept(this);
-        }
+		node.getCondition().accept(this);
         node.getStatement().accept(this);
 	}
 
@@ -162,9 +163,7 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
 
 	@Override
 	public void visit(IfElseStatement node) throws ASTVisitorException {
-		for (Condition c: node.getCondition()) {
-            c.accept(this);
-        }
+		node.getCondition().accept(this);
 		node.getStatement1().accept(this);
         node.getStatement2().accept(this);
 	}
@@ -183,8 +182,10 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
         for (String id : identifier) {
             if (symbolTable.innerScopeLookup(id) != null) {
                 ASTUtils.error(node, "Variable " + id + " already defined");
-            }
-            symbolTable.put(id, new Info(id, type));
+            } else {
+				System.out.println("Adding variable " + id + " to symbol table");
+            	symbolTable.put(id, new Info(id, type));
+			}
         }
 	}
 

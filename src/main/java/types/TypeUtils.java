@@ -19,9 +19,9 @@ public class TypeUtils {
 			return type1;
 		} else if (type2.equals(STRING_TYPE)) {
 			return type2;
-		} else if (type1.equals(Type.DOUBLE_TYPE)) {
+		} else if (type1.equals(Type.CHAR_TYPE)) {
 			return type1;
-		} else if (type2.equals(Type.DOUBLE_TYPE)) {
+		} else if (type2.equals(Type.CHAR_TYPE)) {
 			return type2;
 		} else if (type1.equals(Type.INT_TYPE)) {
 			return type1;
@@ -45,9 +45,9 @@ public class TypeUtils {
 			return type1;
 		} else if (type2.equals(Type.INT_TYPE)) {
 			return type2;
-		} else if (type1.equals(Type.DOUBLE_TYPE)) {
+		} else if (type1.equals(Type.CHAR_TYPE)) {
 			return type1;
-		} else if (type2.equals(Type.DOUBLE_TYPE)) {
+		} else if (type2.equals(Type.CHAR_TYPE)) {
 			return type2;
 		} else if (type1.equals(STRING_TYPE)) {
 			return type1;
@@ -90,20 +90,24 @@ public class TypeUtils {
 
 	public static boolean isUnaryComparible(Operator op, Type type) {
 		switch (op) {
+		case PLUS:
+			return isNumber(type);
 		case MINUS:
 			return isNumber(type);
+		case NOT:
+			return type.equals(Type.BOOLEAN_TYPE);
 		default:
 			return false;
 		}
 	}
 
 	public static boolean isNumber(Type type) {
-		return type.equals(Type.INT_TYPE) || type.equals(Type.DOUBLE_TYPE);
+		return type.equals(Type.INT_TYPE);
 	}
 
 	public static boolean isNumber(Set<Type> types) {
 		for (Type t : types) {
-			if (t.equals(Type.INT_TYPE) || t.equals(Type.DOUBLE_TYPE)) {
+			if (t.equals(Type.INT_TYPE)) {
 				return true;
 			}
 		}
@@ -146,9 +150,9 @@ public class TypeUtils {
 		if (type1.equals(Type.BOOLEAN_TYPE)) {
 			return type2.equals(Type.BOOLEAN_TYPE);
 		} else if (type1.equals(Type.INT_TYPE)) {
-			return type2.equals(Type.INT_TYPE) || type2.equals(Type.DOUBLE_TYPE);
-		} else if (type1.equals(Type.DOUBLE_TYPE)) {
-			return type2.equals(Type.INT_TYPE) || type2.equals(Type.DOUBLE_TYPE);
+			return type2.equals(Type.INT_TYPE);
+		} else if (type1.equals(Type.CHAR_TYPE)) {
+			return type2.equals(Type.CHAR_TYPE);
 		} else { // string
 			return type2.equals(TypeUtils.STRING_TYPE);
 		}

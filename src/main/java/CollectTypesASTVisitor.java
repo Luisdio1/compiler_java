@@ -125,7 +125,7 @@ public class CollectTypesASTVisitor implements ASTVisitor {
 
 	@Override
 	public void visit(UnaryCondition node) throws ASTVisitorException {
-		node.getCondition().accept(this);
+		node.getExpression().accept(this);
 		// try {
 		// 	ASTUtils.setType(node, TypeUtils.applyUnary(node.getOperator(), ASTUtils.getSafeType(node.getExpression())));
 		// } catch (TypeException e) {
@@ -147,12 +147,10 @@ public class CollectTypesASTVisitor implements ASTVisitor {
 
 	@Override
 	public void visit(WhileStatement node) throws ASTVisitorException {
-		for (Condition c : node.getCondition()) {
-            c.accept(this);
-            if (!ASTUtils.getSafeType(c).equals(Type.BOOLEAN)) {
-                ASTUtils.error(c, "Invalid condition, should be boolean");
-            }
-        }
+		node.getCondition().accept(this);
+		if (!ASTUtils.getSafeType(node.getCondition()).equals(Type.BOOLEAN)) {
+			ASTUtils.error(node.getCondition(), "Invalid condition, should be boolean");
+		}
 		node.getStatement().accept(this);
 		ASTUtils.setType(node, Type.NOTHING);
 	}
@@ -177,12 +175,10 @@ public class CollectTypesASTVisitor implements ASTVisitor {
 
 	@Override
 	public void visit(IfStatement node) throws ASTVisitorException {
-		for (Condition c : node.getCondition()) {
-            c.accept(this);
-            if (!ASTUtils.getSafeType(c).equals(Type.BOOLEAN)) {
-                ASTUtils.error(c, "Invalid condition, should be boolean");
-            }
-        }
+		node.getCondition().accept(this);
+		if (!ASTUtils.getSafeType(node.getCondition()).equals(Type.BOOLEAN)) {
+			ASTUtils.error(node.getCondition(), "Invalid condition, should be boolean");
+		}
 		node.getStatement().accept(this);
 		ASTUtils.setType(node, Type.NOTHING);
 	}
@@ -200,12 +196,10 @@ public class CollectTypesASTVisitor implements ASTVisitor {
 
 	@Override
 	public void visit(IfElseStatement node) throws ASTVisitorException {
-		for (Condition c : node.getCondition()) {
-            c.accept(this);
-            if (!ASTUtils.getSafeType(c).equals(Type.BOOLEAN)) {
-                ASTUtils.error(c, "Invalid condition, should be boolean");
-            }
-        }
+		node.getCondition().accept(this);
+		if (!ASTUtils.getSafeType(node.getCondition()).equals(Type.BOOLEAN)) {
+			ASTUtils.error(node.getCondition(), "Invalid condition, should be boolean");
+		}
 		node.getStatement1().accept(this);
 		node.getStatement2().accept(this);
 		ASTUtils.setType(node, Type.NOTHING);

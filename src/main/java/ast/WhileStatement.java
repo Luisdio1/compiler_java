@@ -1,27 +1,21 @@
 package ast;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 public class WhileStatement extends Statement {
 
-    private List<Condition> conditions;
+    private Condition condition;
     private Statement statement;
 
-    public WhileStatement(List<Condition> conditions, Statement statement) {
-        this.conditions = conditions;
+    public WhileStatement(Condition condition, Statement statement) {
+        this.condition = condition;
         this.statement = statement;
     }
 
-    public List<Condition> getCondition() {
-        List<Condition> reversedConditions = new ArrayList<>(conditions);
-        Collections.reverse(reversedConditions);
-        return reversedConditions;
+    public Condition getCondition() {
+        return condition;
     }
 
-    public void setCondition(List<Condition> conditions) {
-        this.conditions = conditions;
+    public void setCondition(Condition condition) {
+        this.condition = condition;
     }
 
     public Statement getStatement() {

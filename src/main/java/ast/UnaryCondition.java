@@ -2,12 +2,30 @@ package ast;
 
 public class UnaryCondition extends Condition {
 
-    private Condition condition;
     private Operator operator;
+    private Expression expression;
+    private Condition condition;
+
+    public UnaryCondition(Operator operator, Expression expression) {
+        this.operator = operator;
+        this.expression = expression;
+    }
 
     public UnaryCondition(Operator operator, Condition condition) {
         this.operator = operator;
         this.condition = condition;
+    }
+
+    public Expression getExpression() {
+        return expression;
+    }
+
+    public void setExpression(Expression expression) {
+        if (expression != null) {
+            this.expression = expression;
+        } else {
+            throw new IllegalArgumentException("Invalid expression");
+        }
     }
 
     public Condition getCondition() {
