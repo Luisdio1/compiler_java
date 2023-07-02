@@ -10,6 +10,9 @@ import org.objectweb.asm.Type;
 public class TypeUtils {
 
 	public static final Type STRING_TYPE = Type.getType(String.class);
+	public static final Type INT_TYPE = Type.getType(int.class);
+	public static final Type CHAR_TYPE = Type.getType(char.class);
+	public static final Type BOOLEAN_TYPE = Type.getType(boolean.class);
 
 	private TypeUtils() {
 	}

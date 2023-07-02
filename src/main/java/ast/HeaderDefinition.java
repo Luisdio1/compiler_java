@@ -3,6 +3,7 @@ package ast;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.objectweb.asm.Type;
 
 public class HeaderDefinition extends Definition {
     

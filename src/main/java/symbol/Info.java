@@ -1,16 +1,18 @@
 package symbol;
 
+import org.objectweb.asm.Type;
+
 /**
  * Information about a symbol
  */
 public class Info {
 
 	private String id;
-	private Object value;
+	private Type type;
 
-	public Info(String id, Object value) {
+	public Info(String id, Type type) {
 		this.id = id;
-		this.value = value;
+		this.type = type;
 	}
 
 	public String getId() {
@@ -21,12 +23,12 @@ public class Info {
 		this.id = id;
 	}
 
-	public Object getValue() {
-		return value;
+	public Type getType() {
+		return type;
 	}
 
-	public void setValue(Object value) {
-		this.value = value;
+	public void setType(Type type) {
+		this.type = type;
 	}
 
 	@Override
@@ -34,7 +36,7 @@ public class Info {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + ((value == null) ? 0 : value.hashCode());
+		result = prime * result + ((type == null) ? 0 : type.hashCode());
 		return result;
 	}
 
@@ -52,10 +54,10 @@ public class Info {
 				return false;
 		} else if (!id.equals(other.id))
 			return false;
-		if (value == null) {
-			if (other.value != null)
+		if (type == null) {
+			if (other.type != null)
 				return false;
-		} else if (!value.equals(other.value))
+		} else if (!type.equals(other.type))
 			return false;
 		return true;
 	}

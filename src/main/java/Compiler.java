@@ -49,8 +49,8 @@ public class Compiler {
                     // construct types
 				    LOGGER.debug("Semantic check (1st pass)");
 				    program.accept(new CollectSymbolsASTVisitor());
-				    // LOGGER.debug("Semantic check (2nd pass)");
-				    // program.accept(new CollectTypesASTVisitor());                  
+				    LOGGER.debug("Semantic check (2nd pass)");
+				    program.accept(new CollectTypesASTVisitor());                  
                     
                     // print program
                     LOGGER.info("Input:");

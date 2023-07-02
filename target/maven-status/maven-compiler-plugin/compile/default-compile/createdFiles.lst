@@ -52,5 +52,4 @@ ast\FunctionDefinition.class
 ast\Expression.class
 ast\StringLiteralExpression.class
 ast\ReturnStatement.class
-ast\Type.class
 symbol\SymbolTable.class

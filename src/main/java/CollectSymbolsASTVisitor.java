@@ -33,6 +33,7 @@ import ast.PutsStatement;
 import ast.ReturnStatement;
 import symbol.Info;
 import symbol.SymbolTable;
+import org.objectweb.asm.Type;
 
 import java.util.List;
 
@@ -134,16 +135,17 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
 		SymbolTable<Info> symbolTable = ASTUtils.getSafeSymbolTable(node);
         List<String> identifier = node.getIdentifiers();
         String type = node.getType();
+		Type t = Type.getType(type);
 
         for (String id : identifier) {
             if (symbolTable.innerScopeLookup(id) != null) {
                 ASTUtils.error(node, "Parameter " + id + " already defined");
             } else {
 				System.out.println("Adding parameter " + id + " to symbol table");
-            	symbolTable.put(id, new Info(id, type));
+            	symbolTable.put(id, new Info(id, t));
 			}
         }
-		System.out.println(symbolTable.getSymbols());
+		// System.out.println(symbolTable.getSymbols());
 	}
 
 	@Override
@@ -178,7 +180,7 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
 	public void visit(VariableDefinition node) throws ASTVisitorException {
 		SymbolTable<Info> symbolTable = ASTUtils.getSafeSymbolTable(node);
         List<String> identifier = node.getIdentifiers();
-        ast.Type type = node.getType();
+        Type type = node.getType();
 
         for (String id : identifier) {
             if (symbolTable.innerScopeLookup(id) != null) {
@@ -189,7 +191,7 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
 			}
         }
 
-		System.out.println(symbolTable.getSymbols());
+		// System.out.println(symbolTable.getSymbols());
 	}
 
 	@Override
@@ -204,7 +206,7 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
         }
         SymbolTable<Info> symbolTable = ASTUtils.getSafeSymbolTable(node);
         String identifier = node.getIdentifier();
-        ast.Type type = node.getType();
+        Type type = node.getType();
 
         if (symbolTable.innerScopeLookup(identifier) != null) {
             ASTUtils.error(node, "Function " + identifier + " already defined");
@@ -212,7 +214,7 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
 			System.out.println("Adding function " + identifier + " to symbol table");
 			symbolTable.put(identifier, new Info(identifier, type));
 		}
-		System.out.println(symbolTable.getSymbols());
+		// System.out.println(symbolTable.getSymbols());
 	}
 
 	@Override

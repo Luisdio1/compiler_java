@@ -1,28 +1,28 @@
-package ast;
+// package ast;
 
-public enum Type {
-    INT("int"),
-    CHAR("char"),
-    NOTHING("nothing"),
-    BOOLEAN("boolean");
+// public enum Type {
+//     INT("int"),
+//     CHAR("char"),
+//     NOTHING("nothing"),
+//     BOOLEAN("boolean");
 
-    private Object type;
+//     private Object type;
 
-    private Type(Object type) {
-        this.type = type;
-    }
+//     private Type(Object type) {
+//         this.type = type;
+//     }
 
-    public Object getType() {
-        return type;
-    }
+//     public Object getType() {
+//         return type;
+//     }
 
-    public void setType(Object type) {
-        this.type = type;
-    }
+//     public void setType(Object type) {
+//         this.type = type;
+//     }
 
-    @Override
-    public String toString() {
-        return type.toString();
-    }
+//     @Override
+//     public String toString() {
+//         return type.toString();
+//     }
     
-}
+// }

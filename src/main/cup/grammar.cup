@@ -3,6 +3,7 @@ import java.util.List;
 import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.objectweb.asm.Type;
 
 import ast.*;
 
@@ -190,7 +191,7 @@ ret_type ::= data_type:dt
             :}
            | NOTHING:n
             {:
-                RESULT = Type.NOTHING;
+                RESULT = Type.VOID_TYPE;
             :}
            ;
 
@@ -241,11 +242,11 @@ var_def ::= VAR:v ids:is COLON data_type:dt arrays:as SEMICOLON
 
 data_type ::= INT:i
             {:
-              RESULT = Type.INT;
+              RESULT = Type.INT_TYPE;
             :}
             | CHAR:c
             {:
-              RESULT = Type.CHAR;
+              RESULT = Type.CHAR_TYPE;
             :}
             ; 
 
