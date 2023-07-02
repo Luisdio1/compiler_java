@@ -176,7 +176,7 @@ ids      ::= IDENTIFIER:i ids:is
                 RESULT = new ArrayList<String>();
                 RESULT.add(i);
             :}
-           | /* nohing */
+           | /* nothing */
             {:  RESULT = new ArrayList<String>();  :}
            ;
 
@@ -233,15 +233,13 @@ arrays    ::= /* empty */
             {:  RESULT = new ArrayList<Integer>(); :}
             | LBRACKET:lb INTEGER_LITERAL:l RBRACKET arrays:as
             {:
-              as.add(l);
-              RESULT = as;
+                as.add(l);
+                RESULT = as;
             :}
             ;
 
 func_decl ::= header:h SEMICOLON 
-            {:
-                RESULT = h;
-            :}
+            {:  RESULT = h;  :}
             ;
 
 stmt ::= SEMICOLON:s
@@ -311,7 +309,7 @@ stmts ::= stmt:s stmts:ss
                 ss.add(s);
                 RESULT = ss;
             :}
-        | /* empty */
+        | /* nothing */
             {:  RESULT = new ArrayList<Statement>();  :}
         ;
 
@@ -328,7 +326,7 @@ exprs ::= COMMA expr:e exprs:es
                 es.add(e);
                 RESULT = es;
             :}
-            | /* empty */
+            | /* nothing */
             {:  RESULT = new ArrayList<Expression>();  :}
         ;
 
