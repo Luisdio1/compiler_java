@@ -88,6 +88,7 @@ non terminal List<Definition> fpar_defs;
 non terminal Type data_type;
 non terminal Type ret_type;
 non terminal Type fpar_type;
+non terminal Type type;
 non terminal Definition local_def;
 non terminal List<Definition> local_defs;
 non terminal Definition var_def;
@@ -213,11 +214,18 @@ local_defs ::= local_def:ld local_defs:lds
             {:  RESULT = new ArrayList<Definition>();  :}
             ;
 
-var_def ::= VAR:v ids:is COLON data_type:dt arrays:as SEMICOLON 
+var_def ::= VAR:v ids:is COLON type:t SEMICOLON 
             {:
-                RESULT = new VariableDefinition(is, dt, as);
+                RESULT = new VariableDefinition(is, t);
                 RESULT.setLine(vleft);
                 RESULT.setColumn(vright);
+            :}
+          ;
+
+type     ::= data_type:dt arrays:as
+            {:
+                ArrayType o = new ArrayType(dt, as);
+                RESULT = o.getArrayType();
             :}
           ;
 

@@ -36,6 +36,7 @@ import symbol.Info;
 import symbol.SymbolTable;
 import org.objectweb.asm.Type;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class CollectSymbolsASTVisitor implements ASTVisitor {
@@ -69,11 +70,11 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
 			}
 		}
 		if (symbolTable.innerScopeLookup(identifier) != null) {
-			System.out.println("LValue " + identifier + " is declared in this scope!");
+			System.out.println("LValue " + identifier + " is declared in this fuc scope!");
 		} else if (symbolTable.lookup(identifier) != null) {
-			System.out.println("LValue " + identifier + " is declared in an outer scope!");
+			System.out.println("LValue " + identifier + " is declared in another func scope!");
 		} else {
-			ASTUtils.error(node, "LValue " + identifier + " was not found in any scope!");
+			ASTUtils.error(node, "LValue " + identifier + " was not found in this func scope!");
 		}
 		node.getExpression2().accept(this);
 	}
@@ -161,6 +162,20 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
 
 	@Override
 	public void visit(FunctionDefinition node) throws ASTVisitorException {
+		SymbolTable<Info> symbolTable = ASTUtils.getSafeSymbolTable(node);
+		List<String> libraries = Arrays.asList("puti", "putc", "puts", 
+													"geti", "getc", "gets", 
+													"abs", "ord", "chr", 
+													"strlen", "strcmp", "strcpy", "strcat");
+		List<Type> librtypes = Arrays.asList(Type.VOID_TYPE, Type.VOID_TYPE, Type.VOID_TYPE,
+											 Type.INT_TYPE, Type.CHAR_TYPE, Type.VOID_TYPE,
+											 Type.INT_TYPE, Type.INT_TYPE, Type.CHAR_TYPE,
+											 Type.INT_TYPE, Type.INT_TYPE, Type.VOID_TYPE, Type.VOID_TYPE);
+
+		for (int j = 0; j < libraries.size(); j++) {
+			symbolTable.put(libraries.get(j), new Info(libraries.get(j), librtypes.get(j)));
+			// System.out.println("Adding library " + libraries.get(j) + " with return type " + librtypes.get(j) + " to symbol table!");
+		}
 		node.getHeader().accept(this);
 		for (int i = 0; i < node.getDefinitions().size(); i++) {
             node.getDefinitions().get(i).accept(this);
@@ -176,9 +191,9 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
 
         for (String id : identifier) {
             if (symbolTable.innerScopeLookup(id) != null) {
-                ASTUtils.error(node, "Parameter " + id + " already defined");
+                ASTUtils.error(node, "Parameter " + id + " already defined in this scope and has type " + t + " !");
             } else {
-				System.out.println("Adding parameter " + id + " to symbol table");
+				System.out.println("Adding parameter " + id + " with type " + t + " to symbol table");
             	symbolTable.put(id, new Info(id, t));
 			}
         }
@@ -188,20 +203,21 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
 	@Override
 	public void visit(IfStatement node) throws ASTVisitorException {
 		node.getCondition().accept(this);
+		String identifier = "";
 		SymbolTable<Info> symbolTable = ASTUtils.getSafeSymbolTable(node);
         Statement statement = node.getStatement();
 		if (statement.getClass() == SpacerStatement.class) {
 			SpacerStatement ss = (SpacerStatement) statement;
 			String lvalue = ss.getExpression1().toString();
 			if (ss.getExpression1().getClass() == IdentifierExpression.class) {
-				String identifier = ((IdentifierExpression) ss.getExpression1()).getIdentifier();
-				System.out.print("I got the id! We're good" + identifier);
+				identifier = ((IdentifierExpression) ss.getExpression1()).getIdentifier();
 			}
 			if (symbolTable.innerScopeLookup(lvalue) != null) {
-				ASTUtils.error(node, "LValue " + lvalue + " already defined");
+				ASTUtils.error(node, "LValue " + identifier + " already defined in this func scope!");
 			} else {
-				System.out.println("Adding LValue " + lvalue + " to symbol table");
-				symbolTable.put(lvalue, new Info(lvalue, Type.INT_TYPE));
+				Type t = symbolTable.lookup(identifier).getType();
+				System.out.println("Adding LValue " + identifier + " to this func scope symbol table!");
+				symbolTable.put(identifier, new Info(identifier, t));
 			}
         }
         node.getStatement().accept(this);
@@ -214,6 +230,18 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
 
 	@Override
 	public void visit(FunctionCallStatement node) throws ASTVisitorException {
+		if (node.getExpression().getClass() == IdentifierExpression.class) {
+			IdentifierExpression ie = (IdentifierExpression) node.getExpression();
+			String identifier = ie.getIdentifier();
+			SymbolTable<Info> symbolTable = ASTUtils.getSafeSymbolTable(node);
+			if (symbolTable.lookup(identifier) == null) {
+				ASTUtils.error(node, "Function " + identifier + " not defined!");
+			} else {
+				Info info = symbolTable.lookup(identifier);
+				Type type = info.getType();
+				symbolTable.put(identifier, new Info(identifier, type));
+			}
+		}
 		node.getExpression().accept(this);
 	}
 
@@ -228,13 +256,12 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
 			Expression lvalue = ss1.getExpression1();
 			if (lvalue.getClass() == IdentifierExpression.class) {
 				identifier = ((IdentifierExpression)lvalue).getIdentifier();
-				System.out.print("I got the id! We're good: " + identifier);
 			}
 			if (symbolTable.innerScopeLookup(identifier) != null) {
-				ASTUtils.error(node, "LValue " + identifier + " already defined in If-Else scope!");
+				ASTUtils.error(node, "LValue " + identifier + " already defined in this func scope!");
 			} else {
 				Type t = symbolTable.lookup(identifier).getType();
-				System.out.println("Adding LValue " + identifier + " to If-Else scope symbol table!");
+				System.out.println("Adding LValue " + identifier + " to this func scope symbol table!");
 				symbolTable.put(identifier, new Info(identifier, t));
 			}
         }
@@ -246,13 +273,12 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
 			Expression lvalue2 = ss2.getExpression1();
 			if (lvalue2.getClass() == IdentifierExpression.class) {
 				identifier = ((IdentifierExpression)lvalue2).getIdentifier();
-				System.out.print("I got the id! We're good: " + identifier);
 			}
 			if (symbolTable2.innerScopeLookup(identifier) != null) {
-				ASTUtils.error(node, "LValue " + identifier + " already defined in If-Else scope!");
+				ASTUtils.error(node, "LValue " + identifier + " already defined in this func scope!");
 			} else {
 				Type t2 = symbolTable2.lookup(identifier).getType();
-				System.out.println("Adding LValue " + identifier + " to If-Else scope symbol table!");
+				System.out.println("Adding LValue " + identifier + " to this func scope symbol table!");
 				symbolTable.put(identifier, new Info(identifier, t2));
 			}
         }
@@ -274,9 +300,9 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
 
         for (String id : identifier) {
             if (symbolTable.innerScopeLookup(id) != null) {
-                ASTUtils.error(node, "Variable " + id + " already defined");
+                ASTUtils.error(node, "Variable " + id + " already defined  with type " + type + "in this func!");
             } else {
-				System.out.println("Adding variable " + id + " to symbol table");
+				System.out.println("Adding variable " + id + " with type " + type + "to symbol table");
             	symbolTable.put(id, new Info(id, type));
 			}
         }
@@ -291,19 +317,20 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
 
 	@Override
 	public void visit(HeaderDefinition node) throws ASTVisitorException {
-		for (Definition d : node.getParameters()) {
+        for (Definition d : node.getParameters()) {
             d.accept(this);
         }
-        SymbolTable<Info> symbolTable = ASTUtils.getSafeSymbolTable(node);
+		SymbolTable<Info> symbolTable = ASTUtils.getSafeSymbolTable(node);
         String identifier = node.getIdentifier();
         Type type = node.getType();
 
         if (symbolTable.innerScopeLookup(identifier) != null) {
-            ASTUtils.error(node, "Function " + identifier + " already defined");
+            ASTUtils.error(node, "Function " + identifier + " already defined in this func scope!");
         } else {
-			System.out.println("Adding function " + identifier + " to symbol table");
 			symbolTable.put(identifier, new Info(identifier, type));
+			System.out.println("Adding function " + identifier + " with type " + type + " to symbol table");
 		}
+		
 		// System.out.println(symbolTable.getSymbols());
 	}
 
@@ -317,6 +344,6 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
 		node.getExpression().accept(this);
 		for (Expression e: node.getExpressions()) {
             e.accept(this);
-        }
+        }		
 	}  
 }

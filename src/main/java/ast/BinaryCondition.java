@@ -58,7 +58,7 @@ public class BinaryCondition extends Condition {
 
     public void setOperator(Operator operator) {
         if ((operator.equals("and") || operator.equals("or")) 
-        || operator.equals("==") || operator.equals("!=") || operator.equals("<") 
+        || operator.equals("=") || operator.equals("#") || operator.equals("<") 
         || operator.equals(">") || operator.equals("<=") || operator.equals(">=")) {
             this.operator = operator;
         } else {

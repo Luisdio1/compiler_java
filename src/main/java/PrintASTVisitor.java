@@ -116,13 +116,6 @@ public class PrintASTVisitor implements ASTVisitor {
         }
         System.out.print(" : ");
         System.out.print(node.getType());
-        if (node.getDimensions().size() > 0) {
-            for(Integer d: node.getDimensions()) {
-                System.out.print("[");
-                System.out.print(d.toString());
-                System.out.print("]");
-            }
-        }
         System.out.println(";");
 	}
 

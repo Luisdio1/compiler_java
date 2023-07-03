@@ -190,7 +190,7 @@
                     <mainClass>java_cup.Main</mainClass>
                     <arguments>
 						<argument>-expect</argument>
-                        <argument>1</argument>
+                        <argument>0</argument>
                         <argument>-destdir</argument>
                         <argument>${basedir}/src/main/java</argument>
                         <argument>${basedir}/src/main/cup/grammar.cup</argument>

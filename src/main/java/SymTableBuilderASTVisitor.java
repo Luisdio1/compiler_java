@@ -141,10 +141,7 @@ public class SymTableBuilderASTVisitor implements ASTVisitor {
 	public void visit(WhileStatement node) throws ASTVisitorException {
 		ASTUtils.setSymbolTable(node, stack.element());
 		node.getCondition().accept(this);
-		startScope();
-		scopeCounter++;
 		node.getStatement().accept(this);
-		endScope();
 	}
 
 	@Override
@@ -155,15 +152,22 @@ public class SymTableBuilderASTVisitor implements ASTVisitor {
 
 	@Override
 	public void visit(FunctionDefinition node) throws ASTVisitorException {
+		
+		ASTUtils.setSymbolTable(node, stack.element());
 		startScope();
 		scopeCounter++;
-        ASTUtils.setSymbolTable(node, stack.element());
         node.getHeader().accept(this);
+		System.out.println("Header scope " + scopeCounter);
+		
         for (Definition d : node.getDefinitions()) {
+			System.out.println("Definition scope " + scopeCounter);
 			d.accept(this);
 		}
+		System.out.println("Block scope " + scopeCounter);
         node.getBlock().accept(this);
-        endScope();
+		endScope();
+		scopeCounter--;
+        
 	}
 
 	@Override
@@ -175,10 +179,7 @@ public class SymTableBuilderASTVisitor implements ASTVisitor {
 	public void visit(IfStatement node) throws ASTVisitorException {
 		ASTUtils.setSymbolTable(node, stack.element());
 		node.getCondition().accept(this);
-		startScope();
-		scopeCounter++;
 		node.getStatement().accept(this);
-		endScope();
 	}
 
 	@Override
@@ -196,11 +197,8 @@ public class SymTableBuilderASTVisitor implements ASTVisitor {
 	public void visit(IfElseStatement node) throws ASTVisitorException {
 		ASTUtils.setSymbolTable(node, stack.element());
 		node.getCondition().accept(this);
-		startScope();
-		scopeCounter++;
 		node.getStatement1().accept(this);
         node.getStatement2().accept(this);
-		endScope();
 	}
 
 	@Override

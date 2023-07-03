@@ -9,12 +9,10 @@ public class VariableDefinition extends Definition {
 
     private List<String> identifiers;
     private Type type;
-    private List<Integer> dimensions;
 
-    public VariableDefinition(List<String> identifiers, Type type, List<Integer> dimensions) {
+    public VariableDefinition(List<String> identifiers, Type type) {
         this.identifiers = identifiers;
         this.type = type;
-        this.dimensions = dimensions;
     }
 
     public List<String> getIdentifiers() {
@@ -33,16 +31,6 @@ public class VariableDefinition extends Definition {
 
     public void setType(Type type) {
     	this.type = type;
-    }
-
-    public List<Integer> getDimensions() {
-        List<Integer> reversedDimensions = new ArrayList<>(dimensions);
-        Collections.reverse(reversedDimensions);
-        return reversedDimensions;
-    }
-
-    public void setDimensions(List<Integer> dimensions) {
-    	this.dimensions = dimensions;
     }
 
     @Override

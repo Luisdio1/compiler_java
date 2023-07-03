@@ -14,6 +14,11 @@ public class ArrayType extends ASTNode {
         this.size = size;
         this.brack = brack;
     }
+
+    public ArrayType(Type type, List<Integer> size) {
+        this.type = type;
+        this.size = size;
+    }
     
     public Type getType() {
         return type;
@@ -28,11 +33,13 @@ public class ArrayType extends ASTNode {
     }
 
     public Type getArrayType() {
-        Type arrayType = type;
-        for (int i = 0; i < size.size(); i++) {
-            arrayType = Type.getType("[" + arrayType.getDescriptor());
+        Type newtype;
+        if ((this.size.size() > 0) || this.brack) {
+            newtype = Type.getType("[" + this.type.getDescriptor());
+        } else {
+            newtype = this.type;
         }
-        return arrayType;
+        return newtype;
     }
     
     public void accept(ASTVisitor visitor) throws ASTVisitorException {
