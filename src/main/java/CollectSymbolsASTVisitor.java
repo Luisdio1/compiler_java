@@ -51,14 +51,30 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
 	@Override
 	public void visit(SpacerStatement node) throws ASTVisitorException {
 		SymbolTable<Info> symbolTable = ASTUtils.getSafeSymbolTable(node);
-		String lvalue = node.getExpression1().toString();
-		if (symbolTable.innerScopeLookup(lvalue) != null) {
-			ASTUtils.error(node, "LValue " + lvalue + " already defined");
-		} else {
-			System.out.println("Adding LValue " + lvalue + " to symbol table");
-			symbolTable.put(lvalue, new Info(lvalue, Type.INT_TYPE));
-		}
+		Expression expression = node.getExpression1();
+		String identifier = "";
 		node.getExpression1().accept(this);
+		if (expression.getClass() == IdentifierExpression.class) {
+			IdentifierExpression exp = (IdentifierExpression) expression;
+			identifier = exp.getIdentifier();
+		} else {
+			LValueExpression exp = (LValueExpression) expression;
+			Expression exp2 = exp.getExpression1();
+			if (exp2.getClass() == IdentifierExpression.class) {
+				IdentifierExpression exp3 = (IdentifierExpression) exp2;
+				identifier = exp3.getIdentifier();
+			} else {
+				ASTUtils.error(node, "LValue " + identifier + " not found");
+				return;
+			}
+		}
+		if (symbolTable.innerScopeLookup(identifier) != null) {
+			System.out.println("LValue " + identifier + " is declared in this scope!");
+		} else if (symbolTable.lookup(identifier) != null) {
+			System.out.println("LValue " + identifier + " is declared in an outer scope!");
+		} else {
+			ASTUtils.error(node, "LValue " + identifier + " was not found in any scope!");
+		}
 		node.getExpression2().accept(this);
 	}
 
@@ -156,8 +172,7 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
 	public void visit(FunctionParameterDefinition node) throws ASTVisitorException {
 		SymbolTable<Info> symbolTable = ASTUtils.getSafeSymbolTable(node);
         List<String> identifier = node.getIdentifiers();
-        String type = node.getType();
-		Type t = Type.getType(type);
+        Type t = node.getType();
 
         for (String id : identifier) {
             if (symbolTable.innerScopeLookup(id) != null) {
@@ -173,6 +188,22 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
 	@Override
 	public void visit(IfStatement node) throws ASTVisitorException {
 		node.getCondition().accept(this);
+		SymbolTable<Info> symbolTable = ASTUtils.getSafeSymbolTable(node);
+        Statement statement = node.getStatement();
+		if (statement.getClass() == SpacerStatement.class) {
+			SpacerStatement ss = (SpacerStatement) statement;
+			String lvalue = ss.getExpression1().toString();
+			if (ss.getExpression1().getClass() == IdentifierExpression.class) {
+				String identifier = ((IdentifierExpression) ss.getExpression1()).getIdentifier();
+				System.out.print("I got the id! We're good" + identifier);
+			}
+			if (symbolTable.innerScopeLookup(lvalue) != null) {
+				ASTUtils.error(node, "LValue " + lvalue + " already defined");
+			} else {
+				System.out.println("Adding LValue " + lvalue + " to symbol table");
+				symbolTable.put(lvalue, new Info(lvalue, Type.INT_TYPE));
+			}
+        }
         node.getStatement().accept(this);
 	}
 
@@ -189,7 +220,42 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
 	@Override
 	public void visit(IfElseStatement node) throws ASTVisitorException {
 		node.getCondition().accept(this);
+		String identifier = "";
+		SymbolTable<Info> symbolTable = ASTUtils.getSafeSymbolTable(node);
+        Statement statement1 = node.getStatement1();
+		if (statement1.getClass() == SpacerStatement.class) {
+			SpacerStatement ss1 = (SpacerStatement) statement1;
+			Expression lvalue = ss1.getExpression1();
+			if (lvalue.getClass() == IdentifierExpression.class) {
+				identifier = ((IdentifierExpression)lvalue).getIdentifier();
+				System.out.print("I got the id! We're good: " + identifier);
+			}
+			if (symbolTable.innerScopeLookup(identifier) != null) {
+				ASTUtils.error(node, "LValue " + identifier + " already defined in If-Else scope!");
+			} else {
+				Type t = symbolTable.lookup(identifier).getType();
+				System.out.println("Adding LValue " + identifier + " to If-Else scope symbol table!");
+				symbolTable.put(identifier, new Info(identifier, t));
+			}
+        }
 		node.getStatement1().accept(this);
+		SymbolTable<Info> symbolTable2 = ASTUtils.getSafeSymbolTable(node);
+        Statement statement2 = node.getStatement2();
+		if (statement2.getClass() == SpacerStatement.class) {
+			SpacerStatement ss2 = (SpacerStatement) statement2;
+			Expression lvalue2 = ss2.getExpression1();
+			if (lvalue2.getClass() == IdentifierExpression.class) {
+				identifier = ((IdentifierExpression)lvalue2).getIdentifier();
+				System.out.print("I got the id! We're good: " + identifier);
+			}
+			if (symbolTable2.innerScopeLookup(identifier) != null) {
+				ASTUtils.error(node, "LValue " + identifier + " already defined in If-Else scope!");
+			} else {
+				Type t2 = symbolTable2.lookup(identifier).getType();
+				System.out.println("Adding LValue " + identifier + " to If-Else scope symbol table!");
+				symbolTable.put(identifier, new Info(identifier, t2));
+			}
+        }
         node.getStatement2().accept(this);
 	}
 

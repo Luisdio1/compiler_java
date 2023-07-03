@@ -3,24 +3,25 @@ package ast;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.objectweb.asm.Type;
 
 public class FunctionParameterDefinition extends Definition {
     
-    private String type;
+    private Type type;
     private List<String> identifiers;
     private boolean ref;
     
-    public FunctionParameterDefinition(String type, List<String> identifiers, boolean ref) {
+    public FunctionParameterDefinition(Type type, List<String> identifiers, boolean ref) {
         this.type = type;
         this.identifiers = identifiers;
         this.ref = ref;
     }
     
-    public String getType() {
+    public Type getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(Type type) {
         this.type = type;
     }
     

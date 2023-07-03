@@ -87,7 +87,7 @@ non terminal Definition fpar_def;
 non terminal List<Definition> fpar_defs;
 non terminal Type data_type;
 non terminal Type ret_type;
-non terminal String fpar_type;
+non terminal Type fpar_type;
 non terminal Definition local_def;
 non terminal List<Definition> local_defs;
 non terminal Definition var_def;
@@ -166,18 +166,16 @@ fpar_def ::= REF:r ids:is COLON fpar_type:ft
             :}
            ;
 
-ids      ::= IDENTIFIER:i ids:is
-            {:
-                is.add(i);
-                RESULT = is;
-            :}
-           | COMMA IDENTIFIER:i ids:is
+ids      ::= IDENTIFIER:i
             {:
                 RESULT = new ArrayList<String>();
                 RESULT.add(i);
             :}
-           | /* nothing */
-            {:  RESULT = new ArrayList<String>();  :}
+           | IDENTIFIER:i COMMA ids:is
+            {:
+                is.add(i);
+                RESULT = is;
+            :}
            ;
 
 ret_type ::= data_type:dt 

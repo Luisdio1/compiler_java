@@ -55,6 +55,7 @@ public class CollectTypesASTVisitor implements ASTVisitor {
 	public void visit(SpacerStatement node) throws ASTVisitorException {
 		SymbolTable<Info> symbolTable = ASTUtils.getSafeSymbolTable(node);
 		Type leftType;
+		String id = "";
 		if (node.getIdentifier() != null) {
 			Info idInfo = symbolTable.lookup(node.getIdentifier());
 			if (idInfo == null) {
@@ -62,9 +63,25 @@ public class CollectTypesASTVisitor implements ASTVisitor {
 			}
 			leftType = idInfo.getType();
 		} else if (node.getExpression1() != null) {
-			Info expInfo = symbolTable.lookup(node.getExpression1().toString());
+			if (node.getExpression1().getClass() == IdentifierExpression.class) {
+				IdentifierExpression expression = (IdentifierExpression) node.getExpression1();
+				id = expression.getIdentifier();
+			} else if (node.getExpression1().getClass() == LValueExpression.class ){
+				LValueExpression expression = (LValueExpression) node.getExpression1();
+				if (expression.getExpression1().getClass() == IdentifierExpression.class) {
+					IdentifierExpression identifierExpression = (IdentifierExpression) expression.getExpression1();
+					id = identifierExpression.getIdentifier();
+				} else {
+					ASTUtils.error(node, "Invalid SpacerStatement");
+					return;
+				}
+			} else {
+				ASTUtils.error(node, "Invalid SpacerStatement");
+				return;
+			}
+			Info expInfo = symbolTable.lookup(id);
 			if (expInfo == null) {
-				ASTUtils.error(node, "Expression " + node.getExpression1().toString() + " not declared.");
+				ASTUtils.error(node, "Expression " + id + " not declared.");
 			}
 			leftType = expInfo.getType();
 		} else {

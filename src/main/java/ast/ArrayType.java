@@ -27,16 +27,12 @@ public class ArrayType extends ASTNode {
         return brack;
     }
 
-    public String getArrayType() {
-        String arrayType = this.type.toString();
-        if (this.brack) {
-            arrayType += "[]";
-        }
+    public Type getArrayType() {
+        Type arrayType = type;
         for (int i = 0; i < size.size(); i++) {
-            arrayType += "[" + size.get(i) + "]";
+            arrayType = Type.getType("[" + arrayType.getDescriptor());
         }
         return arrayType;
-
     }
     
     public void accept(ASTVisitor visitor) throws ASTVisitorException {
