@@ -163,19 +163,32 @@ public class CollectTypesASTVisitor implements ASTVisitor {
 	@Override
 	public void visit(BinaryCondition node) throws ASTVisitorException {
 		Type type1, type2;
+		String id = "";
 		if (node.getExpression1() != null) {
 			node.getExpression1().accept(this);
 			type1 = ASTUtils.getSafeType(node.getExpression1());
+			if (node.getExpression1().getClass() == IdentifierExpression.class) {
+				IdentifierExpression expression = (IdentifierExpression) node.getExpression1();
+				id = expression.getIdentifier();
+				System.out.println("Expression1 id: " + id);
+			}
 		} else {
 			node.getCondition1().accept(this);
 			type1 = ASTUtils.getSafeType(node.getCondition1());
+			System.out.println("It's a condition1");
 		}
 		if (node.getExpression2() != null) {
 			node.getExpression2().accept(this);
 			type2 = ASTUtils.getSafeType(node.getExpression2());
+			if (node.getExpression2().getClass() == IdentifierExpression.class) {
+				IdentifierExpression expression = (IdentifierExpression) node.getExpression1();
+				id = expression.getIdentifier();
+				System.out.println("Expression2 id: " + id);
+			}
 		} else {
 			node.getCondition2().accept(this);
 			type2 = ASTUtils.getSafeType(node.getCondition2());
+			System.out.println("It's a condition2");
 		}
 
 		Operator operator = node.getOperator();
@@ -183,7 +196,7 @@ public class CollectTypesASTVisitor implements ASTVisitor {
 			Type resultType = TypeUtils.applyBinary(operator, type1, type2);
 			ASTUtils.setType(node, resultType);
 		} catch (TypeException e) {
-			ASTUtils.error(node, e.getMessage());
+			ASTUtils.error(node, e.getMessage() + " because of " + type1 + " and " + type2 + " and " + operator);
 		}
 		//TODO
 	}

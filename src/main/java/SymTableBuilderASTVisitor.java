@@ -109,12 +109,14 @@ public class SymTableBuilderASTVisitor implements ASTVisitor {
 		ASTUtils.setSymbolTable(node, stack.element());
 		if (node.getExpression1() != null) {
             node.getExpression1().accept(this);
-        } else {
+        } 
+		if (node.getCondition1() != null) {
             node.getCondition1().accept(this);
         }
 		if (node.getExpression2() != null) {
             node.getExpression2().accept(this);
-        } else {
+        } 
+		if (node.getCondition2() != null) {
             node.getCondition2().accept(this);
         }
 	}
@@ -122,7 +124,12 @@ public class SymTableBuilderASTVisitor implements ASTVisitor {
 	@Override
 	public void visit(UnaryCondition node) throws ASTVisitorException {
 		ASTUtils.setSymbolTable(node, stack.element());
-		node.getExpression().accept(this);
+		if (node.getExpression() != null) {
+			node.getExpression().accept(this);
+		}
+		if (node.getCondition() != null) {
+			node.getCondition().accept(this);
+		}
 	}
 
 	@Override
@@ -238,6 +245,7 @@ public class SymTableBuilderASTVisitor implements ASTVisitor {
 	@Override
 	public void visit(FunctionCallExpression node) throws ASTVisitorException {
 		ASTUtils.setSymbolTable(node, stack.element());
+		node.getExpression().accept(this);
         for (Expression e: node.getExpressions()) {
             e.accept(this);
         }

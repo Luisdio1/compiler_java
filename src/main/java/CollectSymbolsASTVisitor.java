@@ -54,23 +54,24 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
 		SymbolTable<Info> symbolTable = ASTUtils.getSafeSymbolTable(node);
 		Expression expression = node.getExpression1();
 		String identifier = "";
-		node.getExpression1().accept(this);
+		expression.accept(this);
 		if (expression.getClass() == IdentifierExpression.class) {
-			IdentifierExpression exp = (IdentifierExpression) expression;
-			identifier = exp.getIdentifier();
+			IdentifierExpression idExp = (IdentifierExpression) expression;
+			identifier = idExp.getIdentifier();
 		} else {
-			LValueExpression exp = (LValueExpression) expression;
-			Expression exp2 = exp.getExpression1();
+			LValueExpression lvExp = (LValueExpression) expression;
+			Expression exp2 = lvExp.getExpression1();
 			if (exp2.getClass() == IdentifierExpression.class) {
-				IdentifierExpression exp3 = (IdentifierExpression) exp2;
-				identifier = exp3.getIdentifier();
+				IdentifierExpression idExp2 = (IdentifierExpression) exp2;
+				identifier = idExp2.getIdentifier();
 			} else {
-				ASTUtils.error(node, "LValue " + identifier + " not found");
+				ASTUtils.error(node, "LValue " + identifier + " has not been declared!");
 				return;
 			}
 		}
 		if (symbolTable.innerScopeLookup(identifier) != null) {
-			System.out.println("LValue " + identifier + " is declared in this fuc scope!");
+			Type type = symbolTable.innerScopeLookup(identifier).getType();
+			System.out.println("LValue " + identifier + " is declared in this func scope and has type " + type + "!");
 		} else if (symbolTable.lookup(identifier) != null) {
 			System.out.println("LValue " + identifier + " is declared in another func scope!");
 		} else {
@@ -126,7 +127,6 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
 			node.getExpression1().accept(this);
 			node.getExpression2().accept(this);
 		}
-		//NOT SURE
 	}
 
 	@Override
@@ -136,7 +136,6 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
 		} else {
 			node.getExpression().accept(this);
 		}
-		// NOT SURE
 	}
 
 	@Override
@@ -163,6 +162,7 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
 	@Override
 	public void visit(FunctionDefinition node) throws ASTVisitorException {
 		SymbolTable<Info> symbolTable = ASTUtils.getSafeSymbolTable(node);
+		/* INSERTING THE LIBRARIES IN THE PROGRAM */
 		List<String> libraries = Arrays.asList("puti", "putc", "puts", 
 													"geti", "getc", "gets", 
 													"abs", "ord", "chr", 
@@ -197,7 +197,6 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
             	symbolTable.put(id, new Info(id, t));
 			}
         }
-		// System.out.println(symbolTable.getSymbols());
 	}
 
 	@Override
@@ -208,16 +207,18 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
         Statement statement = node.getStatement();
 		if (statement.getClass() == SpacerStatement.class) {
 			SpacerStatement ss = (SpacerStatement) statement;
-			String lvalue = ss.getExpression1().toString();
-			if (ss.getExpression1().getClass() == IdentifierExpression.class) {
-				identifier = ((IdentifierExpression) ss.getExpression1()).getIdentifier();
+			Expression lvExp = ss.getExpression1();
+			if (lvExp.getClass() == IdentifierExpression.class) {
+				identifier = ((IdentifierExpression)lvExp).getIdentifier();
 			}
-			if (symbolTable.innerScopeLookup(lvalue) != null) {
+			if (symbolTable.innerScopeLookup(identifier) != null) {
 				ASTUtils.error(node, "LValue " + identifier + " already defined in this func scope!");
 			} else {
-				Type t = symbolTable.lookup(identifier).getType();
-				System.out.println("Adding LValue " + identifier + " to this func scope symbol table!");
-				symbolTable.put(identifier, new Info(identifier, t));
+				System.out.println("LValue " + identifier + " exists in another's func's scope and has type " 
+											 + symbolTable.lookup(identifier).getType() + " !");
+				// Type t = symbolTable.lookup(identifier).getType();
+				// System.out.println("Adding LValue " + identifier + " to this func scope symbol table!");
+				// symbolTable.put(identifier, new Info(identifier, t));
 			}
         }
         node.getStatement().accept(this);
@@ -239,7 +240,7 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
 			} else {
 				Info info = symbolTable.lookup(identifier);
 				Type type = info.getType();
-				symbolTable.put(identifier, new Info(identifier, type));
+				System.out.println("Function " + identifier + " exists in ST and has type " + type + " !");
 			}
 		}
 		node.getExpression().accept(this);
@@ -302,11 +303,10 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
             if (symbolTable.innerScopeLookup(id) != null) {
                 ASTUtils.error(node, "Variable " + id + " already defined  with type " + type + "in this func!");
             } else {
-				System.out.println("Adding variable " + id + " with type " + type + "to symbol table");
+				System.out.println("Adding variable " + id + " with type " + type + " to symbol table");
             	symbolTable.put(id, new Info(id, type));
 			}
         }
-		// System.out.println(symbolTable.getSymbols());
 	}
 
 	@Override
@@ -330,8 +330,6 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
 			symbolTable.put(identifier, new Info(identifier, type));
 			System.out.println("Adding function " + identifier + " with type " + type + " to symbol table");
 		}
-		
-		// System.out.println(symbolTable.getSymbols());
 	}
 
 	@Override
@@ -343,7 +341,15 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
 	public void visit(FunctionCallExpression node) throws ASTVisitorException {
 		node.getExpression().accept(this);
 		for (Expression e: node.getExpressions()) {
-            e.accept(this);
-        }		
+			e.accept(this);
+		}
+		// SymbolTable<Info> symbolTable = ASTUtils.getSafeSymbolTable(node);
+		// if (symbolTable.lookup(node.getIdentifier()) != null) {
+		// 	Info info = symbolTable.lookup(node.getIdentifier());
+		// 	Type type = info.getType();
+		// 	System.out.println("Function " + node.getIdentifier() + " exists in ST and has type " + type + " !");
+		// } else {
+		// 	ASTUtils.error(node, "Function " + node.getIdentifier() + " not defined!");
+		// }	
 	}  
 }
