@@ -71,6 +71,7 @@ public class CollectTypesASTVisitor implements ASTVisitor {
 				if (expression.getExpression1().getClass() == IdentifierExpression.class) {
 					IdentifierExpression identifierExpression = (IdentifierExpression) expression.getExpression1();
 					id = identifierExpression.getIdentifier();
+					expression.getExpression1().accept(this);
 				} else {
 					ASTUtils.error(node, "Invalid SpacerStatement");
 					return;
@@ -162,7 +163,7 @@ public class CollectTypesASTVisitor implements ASTVisitor {
 
 	@Override
 	public void visit(BinaryCondition node) throws ASTVisitorException {
-		Type type1, type2;
+		Type type1 = null, type2 = null;
 		String id = "";
 		if (node.getExpression1() != null) {
 			node.getExpression1().accept(this);
@@ -171,8 +172,12 @@ public class CollectTypesASTVisitor implements ASTVisitor {
 				IdentifierExpression expression = (IdentifierExpression) node.getExpression1();
 				id = expression.getIdentifier();
 				System.out.println("Expression1 id: " + id);
+			} else if (node.getExpression1().getClass() == FunctionCallExpression.class) {
+				FunctionCallExpression expression = (FunctionCallExpression) node.getExpression1();
+				id = expression.getIdentifier();
+				System.out.println("Expression1 id: " + id);
 			}
-		} else {
+		if (node.getCondition1() != null) {
 			node.getCondition1().accept(this);
 			type1 = ASTUtils.getSafeType(node.getCondition1());
 			System.out.println("It's a condition1");
@@ -185,7 +190,8 @@ public class CollectTypesASTVisitor implements ASTVisitor {
 				id = expression.getIdentifier();
 				System.out.println("Expression2 id: " + id);
 			}
-		} else {
+		} 
+		if (node.getCondition2() != null) {
 			node.getCondition2().accept(this);
 			type2 = ASTUtils.getSafeType(node.getCondition2());
 			System.out.println("It's a condition2");
@@ -197,7 +203,10 @@ public class CollectTypesASTVisitor implements ASTVisitor {
 			ASTUtils.setType(node, resultType);
 		} catch (TypeException e) {
 			ASTUtils.error(node, e.getMessage() + " because of " + type1 + " and " + type2 + " and " + operator);
+		} finally {
+			System.out.println("BinaryCondition: " + id + " has type " + ASTUtils.getSafeType(node));
 		}
+	}
 		//TODO
 	}
 
@@ -319,6 +328,7 @@ public class CollectTypesASTVisitor implements ASTVisitor {
         }
 		// String identifier = node.getIdentifier();
 		Type type = node.getType();
+		System.out.println("I SEE THAT HEADER " + node.getIdentifier() + " HAS TYPE " + type);
 		ASTUtils.setType(node, type);
 	}
 
@@ -329,10 +339,16 @@ public class CollectTypesASTVisitor implements ASTVisitor {
 
 	@Override
 	public void visit(FunctionCallExpression node) throws ASTVisitorException {
+		// node.getExpression().accept(this);
 		for (Expression e: node.getExpressions()) {
             e.accept(this);
         }
-		ASTUtils.setType(node, Type.VOID_TYPE);
+		SymbolTable<Info> table = ASTUtils.getSafeSymbolTable(node);
+		if (table.lookup(node.getIdentifier()) != null) {
+			ASTUtils.setType(node, table.lookup(node.getIdentifier()).getType());
+		} else {
+			ASTUtils.error(node, "Function " + node.getIdentifier() + " not defined");
+		}
 	}
     
 }

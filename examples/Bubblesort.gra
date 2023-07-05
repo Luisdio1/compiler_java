@@ -17,7 +17,7 @@ fun main () : nothing
             changed <- 0;
             i <- 0;
             while i < n-1 do {
-                if x > x then {
+                if x[i] > x[i+1] then {
                     swap(x[i],x[i+1]);
                     changed <- 1;
                 }
