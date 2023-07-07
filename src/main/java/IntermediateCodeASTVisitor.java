@@ -2,6 +2,8 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Iterator;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+
 import ast.ASTUtils;
 import ast.ASTVisitor;
 import ast.ASTVisitorException;
@@ -36,6 +38,8 @@ import ast.WhileStatement;
 import threeaddr.AssignInstr;
 import threeaddr.Intermediate;
 import threeaddr.PrintInstr;
+import threeaddr.UnaryOpInstr;
+import threeaddr.FuctionCallInstr;
 
 public class IntermediateCodeASTVisitor implements ASTVisitor{
 	
@@ -94,7 +98,7 @@ public class IntermediateCodeASTVisitor implements ASTVisitor{
 
 	@Override
 	public void visit(IdentifierExpression node) throws ASTVisitorException {
-		// TODO Auto-generated method stub
+		stack.push(node.getIdentifier());
 		
 	}
 
@@ -106,13 +110,24 @@ public class IntermediateCodeASTVisitor implements ASTVisitor{
 
 	@Override
 	public void visit(CharLiteralExpression node) throws ASTVisitorException {
-		// TODO Auto-generated method stub
-		
+		if (ASTUtils.isBooleanExpression(node)) {
+			ASTUtils.error(node, "Characters cannot be used as boolean expressions");
+		} else {
+			String t = createTemp();
+			stack.push(t);
+			intermediate.add(new AssignInstr("\"" + StringEscapeUtils.escapeJava(node.getLiteral()) + "\"", t));
+		}
 	}
 
 	@Override
 	public void visit(StringLiteralExpression node) throws ASTVisitorException {
-		// TODO Auto-generated method stub
+		if (ASTUtils.isBooleanExpression(node)) {
+			ASTUtils.error(node, "Strings cannot be used as boolean expressions");
+		} else {
+			String t = createTemp();
+			stack.push(t);
+			intermediate.add(new AssignInstr("\"" + StringEscapeUtils.escapeJava(node.getLiteral()) + "\"", t));
+		}
 		
 	}
 
@@ -124,8 +139,11 @@ public class IntermediateCodeASTVisitor implements ASTVisitor{
 
 	@Override
 	public void visit(UnaryExpression node) throws ASTVisitorException {
-		// TODO Auto-generated method stub
-		
+		node.getExpression().accept(this);
+		String t1 = stack.pop();
+		String t = createTemp();
+		stack.push(t);
+		intermediate.add(new UnaryOpInstr(node.getOperator(),t1, t));
 	}
 
 	@Override
@@ -142,8 +160,11 @@ public class IntermediateCodeASTVisitor implements ASTVisitor{
 
 	@Override
 	public void visit(ParenthesisExpression node) throws ASTVisitorException {
-		// TODO Auto-generated method stub
-		
+		node.getExpression().accept(this);
+		String t1 = stack.pop();
+		String t = createTemp();
+		stack.push(t);
+		intermediate.add(new AssignInstr(t1, t));
 	}
 
 	@Override
