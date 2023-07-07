@@ -57,6 +57,12 @@ public class Compiler {
                     ASTVisitor printVisitor = new PrintASTVisitor();
                     program.accept(printVisitor);
                     
+                    LOGGER.info("3-address code:");
+                    IntermediateCodeASTVisitor threeAddrVisitor = new IntermediateCodeASTVisitor();
+                    program.accept(threeAddrVisitor);
+                    String intermediateCode = threeAddrVisitor.getIntermediate().emit();
+                    System.out.println(intermediateCode);
+                    
                     LOGGER.info("Compilation done");
                 } catch (java.io.FileNotFoundException e) {
                     LOGGER.error("File not found : \"" + args[i] + "\"");

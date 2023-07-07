@@ -2,6 +2,11 @@ package ast;
 
 import symbol.Info;
 import symbol.SymbolTable;
+import threeaddr.GoToInstr;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.objectweb.asm.Type;
 
 public class ASTUtils {
@@ -9,6 +14,9 @@ public class ASTUtils {
 	public static final String SYMTABLE_PROPERTY = "SYMTABLE_PROPERTY";
 	public static final String IS_BOOLEAN_EXPR_PROPERTY = "IS_BOOLEAN_EXPR_PROPERTY";
 	public static final String TYPE_PROPERTY = "TYPE_PROPERTY";
+	public static final String NEXT_LIST_PROPERTY = "NEXT_LIST_PROPERTY";
+	public static final String TRUE_LIST_PROPERTY = "TRUE_LIST_PROPERTY";
+	public static final String FALSE_LIST_PROPERTY = "FALSE_LIST_PROPERTY";
 
 	private ASTUtils() {
 	}
@@ -57,6 +65,48 @@ public class ASTUtils {
 
 	public static void setType(ASTNode node, Type type) {
 		node.setProperty(TYPE_PROPERTY, type);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static List<threeaddr.GoToInstr> getTrueList(Expression node){
+		List<threeaddr.GoToInstr> l =(List<threeaddr.GoToInstr>) node.getProperty(TRUE_LIST_PROPERTY);
+		if (l == null) {
+			l = new ArrayList<threeaddr.GoToInstr>();
+			node.setProperty(TRUE_LIST_PROPERTY, l);
+		}
+		return l;
+	}
+	
+	public static void setTrueList(Expression node, List<threeaddr.GoToInstr> list) {
+		node.setProperty(TRUE_LIST_PROPERTY, list);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static List<threeaddr.GoToInstr> getFalseList(Expression node){
+		List<threeaddr.GoToInstr> l =(List<threeaddr.GoToInstr>) node.getProperty(FALSE_LIST_PROPERTY);
+		if (l == null) {
+			l = new ArrayList<threeaddr.GoToInstr>();
+			node.setProperty(FALSE_LIST_PROPERTY, l);
+		}
+		return l;
+	}
+	
+	public static void setFalseList(Expression node, List<threeaddr.GoToInstr> list) {
+		node.setProperty(FALSE_LIST_PROPERTY, list);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static List<GoToInstr> getNextList(Statement node){
+		List<GoToInstr> l =(List<GoToInstr>) node.getProperty(NEXT_LIST_PROPERTY);
+		if (l == null) {
+			l = new ArrayList<GoToInstr>();
+			node.setProperty(NEXT_LIST_PROPERTY, l);
+		}
+		return l;
+	}
+	
+	public static void setNextList(Statement node, List<threeaddr.GoToInstr> list) {
+		node.setProperty(NEXT_LIST_PROPERTY, list);
 	}
 
 	public static void error(ASTNode node, String message) throws ASTVisitorException {
