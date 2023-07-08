@@ -47,7 +47,7 @@ public class ASTUtils {
 		return b;
 	}
 
-	public static void setBooleanExpression(Expression node, boolean value) {
+	public static void setBooleanExpression(Condition node, boolean value) {
 		node.setProperty(IS_BOOLEAN_EXPR_PROPERTY, value);
 	}
 
@@ -77,7 +77,21 @@ public class ASTUtils {
 		return l;
 	}
 	
+	@SuppressWarnings("unchecked")
+	public static List<threeaddr.GoToInstr> getTrueListCondition(Condition node){
+		List<threeaddr.GoToInstr> l =(List<threeaddr.GoToInstr>) node.getProperty(TRUE_LIST_PROPERTY);
+		if (l == null) {
+			l = new ArrayList<threeaddr.GoToInstr>();
+			node.setProperty(TRUE_LIST_PROPERTY, l);
+		}
+		return l;
+	}
+	
 	public static void setTrueList(Expression node, List<threeaddr.GoToInstr> list) {
+		node.setProperty(TRUE_LIST_PROPERTY, list);
+	}
+	
+	public static void setTrueListCondition(Condition node, List<threeaddr.GoToInstr> list) {
 		node.setProperty(TRUE_LIST_PROPERTY, list);
 	}
 	
@@ -91,7 +105,21 @@ public class ASTUtils {
 		return l;
 	}
 	
+	@SuppressWarnings("unchecked")
+	public static List<threeaddr.GoToInstr> getFalseListCondition(Condition node){
+		List<threeaddr.GoToInstr> l =(List<threeaddr.GoToInstr>) node.getProperty(FALSE_LIST_PROPERTY);
+		if (l == null) {
+			l = new ArrayList<threeaddr.GoToInstr>();
+			node.setProperty(FALSE_LIST_PROPERTY, l);
+		}
+		return l;
+	}
+	
 	public static void setFalseList(Expression node, List<threeaddr.GoToInstr> list) {
+		node.setProperty(FALSE_LIST_PROPERTY, list);
+	}
+	
+	public static void setFalseListCondition(Condition node, List<threeaddr.GoToInstr> list) {
 		node.setProperty(FALSE_LIST_PROPERTY, list);
 	}
 	
