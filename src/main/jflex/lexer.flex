@@ -30,8 +30,8 @@ import java_cup.runtime.Symbol;
 
 LineTerminator = \r|\n|\r\n
 WhiteSpace     = {LineTerminator} | [ \t\f] 
-Comment        = "\\\$" [^$] ~"\\\$" | "\\\$" "\\"+ "$"
-SingleComment  = "\\\$" [^$] {LineTerminator}?
+Comment        = "\\\$\\\$" [^$] ~"\\\$\\\$" | "\\\$\\\$" "\\\$"+ "\\\$"
+SingleComment  = "\\\$" [^$] ~{WhiteSpace}
 
 Identifier     = [:jletter:] [:jletterdigit:]*
 IntegerLiteral = 0 | [1-9][0-9]*
@@ -69,8 +69,8 @@ CharLiteral    = \'(\\.|[^\n'\\])\'?
     {IntegerLiteral}      { return createSymbol(sym.INTEGER_LITERAL, Integer.valueOf(yytext())); }
 
     \"                    { sb.setLength(0); yybegin(STRING); }
-    \\\$\\\$              { yybegin(COMMENT); }
-    \\\$                  { yybegin(SINGLE_COMMENT); }
+    {Comment}             { /* ignore */ }
+    {SingleComment}       { /* ignore */ }
 
     /* operators */
     "="                   { return createSymbol(sym.EQ); }
@@ -110,16 +110,6 @@ CharLiteral    = \'(\\.|[^\n'\\])\'?
     \\r                   { sb.append('\r'); }
     \\\"                  { sb.append('\"'); }
     \\                    { sb.append('\\'); }
-}
-
-<COMMENT> {
-    {Comment}             { /* ignore */ }
-
-}
-
-<SINGLE_COMMENT> {
-    {SingleComment}       { /* ignore */ }
-
 }
 
 /* error fallback */
