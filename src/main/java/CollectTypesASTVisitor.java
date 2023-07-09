@@ -165,49 +165,58 @@ public class CollectTypesASTVisitor implements ASTVisitor {
 	public void visit(BinaryCondition node) throws ASTVisitorException {
 		Type type1 = null, type2 = null;
 		String id = "";
+		Integer num = null;
 		if (node.getExpression1() != null) {
 			node.getExpression1().accept(this);
 			type1 = ASTUtils.getSafeType(node.getExpression1());
 			if (node.getExpression1().getClass() == IdentifierExpression.class) {
 				IdentifierExpression expression = (IdentifierExpression) node.getExpression1();
 				id = expression.getIdentifier();
-				System.out.println("Expression1 id: " + id);
+				System.out.println("IdExp1 id: " + id + " with type: " + type1);
 			} else if (node.getExpression1().getClass() == FunctionCallExpression.class) {
 				FunctionCallExpression expression = (FunctionCallExpression) node.getExpression1();
 				id = expression.getIdentifier();
-				System.out.println("Expression1 id: " + id);
+				System.out.println("FuncCallExp1 id: " + id + " with type: " + type1);
 			}
+		}
 		if (node.getCondition1() != null) {
 			node.getCondition1().accept(this);
 			type1 = ASTUtils.getSafeType(node.getCondition1());
-			System.out.println("It's a condition1");
+			System.out.println("It's a condition1 with type: " + type1);
 		}
 		if (node.getExpression2() != null) {
 			node.getExpression2().accept(this);
 			type2 = ASTUtils.getSafeType(node.getExpression2());
 			if (node.getExpression2().getClass() == IdentifierExpression.class) {
-				IdentifierExpression expression = (IdentifierExpression) node.getExpression1();
+				IdentifierExpression expression = (IdentifierExpression) node.getExpression2();
 				id = expression.getIdentifier();
-				System.out.println("Expression2 id: " + id);
+				System.out.println("IdExp2 id: " + id + " with type: " + type2);
+			} else if (node.getExpression2().getClass() == FunctionCallExpression.class) {
+				FunctionCallExpression expression = (FunctionCallExpression) node.getExpression2();
+				id = expression.getIdentifier();
+				System.out.println("FuncCallExp2 id: " + id + " with type: " + type1);
+			} else if (node.getExpression2().getClass() == IntegerLiteralExpression.class) {
+				IntegerLiteralExpression expression = (IntegerLiteralExpression) node.getExpression2();
+				num = expression.getLiteral();
+				System.out.println("IntLitExp2 num: " + num + " with type: " + Type.INT_TYPE);
 			}
 		} 
 		if (node.getCondition2() != null) {
 			node.getCondition2().accept(this);
 			type2 = ASTUtils.getSafeType(node.getCondition2());
-			System.out.println("It's a condition2");
+			System.out.println("It's a condition2 with type: " + type2);
 		}
 
 		Operator operator = node.getOperator();
+		Type resultType = null;
 		try {
-			Type resultType = TypeUtils.applyBinary(operator, type1, type2);
+			resultType = TypeUtils.applyBinary(operator, type1, type2);
 			ASTUtils.setType(node, resultType);
 		} catch (TypeException e) {
 			ASTUtils.error(node, e.getMessage() + " because of " + type1 + " and " + type2 + " and " + operator);
 		} finally {
-			System.out.println("BinaryCondition: " + id + " has type " + ASTUtils.getSafeType(node));
+			System.out.println("BinaryCondition has type " + resultType);
 		}
-	}
-		//TODO
 	}
 
 	@Override
@@ -292,6 +301,21 @@ public class CollectTypesASTVisitor implements ASTVisitor {
 
 	@Override
 	public void visit(FunctionCallStatement node) throws ASTVisitorException {
+		if (node.getExpression().getClass() == IdentifierExpression.class) {
+			IdentifierExpression ie = (IdentifierExpression) node.getExpression();
+			String identifier = ie.getIdentifier();
+			SymbolTable<Info> symbolTable = ASTUtils.getSafeSymbolTable(node);
+			if (symbolTable.lookup(identifier) == null) {
+				ASTUtils.error(node, "Function " + identifier + " not defined!");
+			} else {
+				Info info = symbolTable.lookup(identifier);
+				Type type = info.getType();
+				System.out.println("Function " + identifier + " exists in ST and has type " + type + " !");
+				ASTUtils.setType(node, type);
+			}
+		}
+		// node.getExpression().accept(this);
+		// ASTUtils.setType(node, ASTUtils.getSafeType(node.getExpression()));
 		ASTUtils.setType(node, Type.VOID_TYPE);
 	}
 
@@ -308,7 +332,12 @@ public class CollectTypesASTVisitor implements ASTVisitor {
 
 	@Override
 	public void visit(ReturnStatement node) throws ASTVisitorException {
-		ASTUtils.setType(node, Type.VOID_TYPE);
+		if (node.getExpression() != null) {
+			node.getExpression().accept(this);
+			ASTUtils.setType(node, ASTUtils.getSafeType(node.getExpression()));
+		} else {
+			ASTUtils.setType(node, Type.VOID_TYPE);
+		}
 	}
 
 	@Override

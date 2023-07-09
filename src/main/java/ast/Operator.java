@@ -39,6 +39,7 @@ public enum Operator {
     public boolean isRelational() {
         return this.equals(Operator.EQ) || this.equals(Operator.NEQ)
                 || this.equals(Operator.GTHAN) || this.equals(Operator.GEQ)
-                || this.equals(Operator.LTHAN) || this.equals(Operator.LEQ);
+                || this.equals(Operator.LTHAN) || this.equals(Operator.LEQ)
+                || this.equals(Operator.AND) || this.equals(Operator.OR);
     }
 }

@@ -339,17 +339,17 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
 
 	@Override
 	public void visit(FunctionCallExpression node) throws ASTVisitorException {
-		node.getExpression().accept(this);
+		// node.getExpression().accept(this);
 		for (Expression e: node.getExpressions()) {
 			e.accept(this);
 		}
-		// SymbolTable<Info> symbolTable = ASTUtils.getSafeSymbolTable(node);
-		// if (symbolTable.lookup(node.getIdentifier()) != null) {
-		// 	Info info = symbolTable.lookup(node.getIdentifier());
-		// 	Type type = info.getType();
-		// 	System.out.println("Function " + node.getIdentifier() + " exists in ST and has type " + type + " !");
-		// } else {
-		// 	ASTUtils.error(node, "Function " + node.getIdentifier() + " not defined!");
-		// }	
+		SymbolTable<Info> symbolTable = ASTUtils.getSafeSymbolTable(node);
+		if (symbolTable.lookup(node.getIdentifier()) != null) {
+			Info info = symbolTable.lookup(node.getIdentifier());
+			Type type = info.getType();
+			System.out.println("Function " + node.getIdentifier() + " exists in ST and has type " + type + " !");
+		} else {
+			symbolTable.put(node.getIdentifier(), new Info(node.getIdentifier(), Type.INT_TYPE));
+		}
 	}  
 }
