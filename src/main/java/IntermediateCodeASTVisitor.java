@@ -259,8 +259,6 @@ public class IntermediateCodeASTVisitor implements ASTVisitor{
 	public void visit(ParenthesisCondition node) throws ASTVisitorException {
 		System.out.println("Visiting ParenthesisCondition");
 		node.getCondition().accept(this);
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -315,8 +313,8 @@ public class IntermediateCodeASTVisitor implements ASTVisitor{
 		node.getStatement().accept(this);
 		Intermediate.backpatch(ASTUtils.getTrueListCondition(node.getCondition()), trueLabel);
 		
-		ASTUtils.getNextList(node).addAll(ASTUtils.getFalseListCondition(node.getCondition()));
 		ASTUtils.getNextList(node).addAll(ASTUtils.getNextList(node.getStatement()));
+		ASTUtils.getNextList(node).addAll(ASTUtils.getFalseListCondition(node.getCondition()));
 	}
 
 	@Override
@@ -329,8 +327,7 @@ public class IntermediateCodeASTVisitor implements ASTVisitor{
 	@Override
 	public void visit(FunctionCallStatement node) throws ASTVisitorException {
 		System.out.println("Visiting FunctionCallStatement");
-		node.getExpression().accept(this);
-		
+		node.getExpression().accept(this);	
 	}
 
 	@Override
