@@ -4,5 +4,4 @@ fun hello (): nothing
     if (x < 1) then 
         puts("Yes it is");
     puts("Hello world!\n");
-    return y;
 }

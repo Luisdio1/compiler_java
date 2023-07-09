@@ -1,6 +1,8 @@
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
@@ -11,7 +13,9 @@ import ast.ArrayType;
 import ast.BinaryCondition;
 import ast.BinaryExpression;
 import ast.CharLiteralExpression;
+import ast.Definition;
 import ast.EmptyStatement;
+import ast.Expression;
 import ast.FunctionCallExpression;
 import ast.FunctionCallStatement;
 import ast.FunctionDefinition;
@@ -269,9 +273,10 @@ public class IntermediateCodeASTVisitor implements ASTVisitor{
 	public void visit(FunctionDefinition node) throws ASTVisitorException {
 		System.out.println("Visiting FunctionDefinition");
 		node.getHeader().accept(this);
-		node.getBlock().accept(this);
-		// TODO Auto-generated method stub
-		
+		for (Definition definition : node.getDefinitions()) {
+			definition.accept(this);
+		}
+		node.getBlock().accept(this);		
 	}
 
 	@Override
@@ -305,7 +310,7 @@ public class IntermediateCodeASTVisitor implements ASTVisitor{
 	@Override
 	public void visit(FunctionCallStatement node) throws ASTVisitorException {
 		System.out.println("Visiting FunctionCallStatement");
-		// TODO Auto-generated method stub
+		node.getExpression().accept(this);
 		
 	}
 
@@ -333,7 +338,7 @@ public class IntermediateCodeASTVisitor implements ASTVisitor{
 	@Override
 	public void visit(ReturnStatement node) throws ASTVisitorException {
 		System.out.println("Visiting ReturnStatement");
-		// TODO Auto-generated method stub
+		node.getExpression().accept(this);
 		
 	}
 
@@ -347,14 +352,17 @@ public class IntermediateCodeASTVisitor implements ASTVisitor{
 	@Override
 	public void visit(LValueExpression node) throws ASTVisitorException {
 		System.out.println("Visiting LValueExpression");
-		// TODO Auto-generated method stub
+		node.getExpression1().accept(this);
+		node.getExpression2().accept(this);
 		
 	}
 
 	@Override
 	public void visit(HeaderDefinition node) throws ASTVisitorException {
 		System.out.println("Visiting HeaderDefinition");
-		// TODO Auto-generated method stub
+		for (Definition par : node.getParameters()) {
+			par.accept(this);
+		}
 		
 	}
 
@@ -368,8 +376,17 @@ public class IntermediateCodeASTVisitor implements ASTVisitor{
 	@Override
 	public void visit(FunctionCallExpression node) throws ASTVisitorException {
 		System.out.println("Visiting FunctionCallExpression");
-		// TODO Auto-generated method stub
-		
+		for (Expression exp : node.getExpressions()) {
+			exp.accept(this);
+		}
+		List<String> args = new ArrayList<String>();
+		for (int i = 0; i < node.getExpressions().size(); i++) {
+			args.add(stack.pop());
+		}
+		String result = createTemp();
+		FuctionCallInstr instr = new FuctionCallInstr(args, node.getIdentifier(), result);
+		intermediate.add(instr);
+		stack.push(result);
 	}
 
 }

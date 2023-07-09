@@ -9,7 +9,7 @@ public class FuctionCallInstr implements Instruction{
 	private String name;
 	private String result;
 	
-	public FuctionCallInstr(ArrayList<String> params, String name, String result) {
+	public FuctionCallInstr(List<String> params, String name, String result) {
 		this.params = params;
 		this.name = name;
 		this.result = result;

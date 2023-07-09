@@ -318,7 +318,22 @@ public class CollectTypesASTVisitor implements ASTVisitor {
 
 	@Override
 	public void visit(LValueExpression node) throws ASTVisitorException {
-		ASTUtils.setType(node, Type.VOID_TYPE);
+		String id = "";
+		node.getExpression1().accept(this);
+		node.getExpression2().accept(this);
+		if (node.getExpression1().getClass() == IdentifierExpression.class) {
+			IdentifierExpression idexp = (IdentifierExpression) node.getExpression1();
+			id = idexp.getIdentifier();
+		}
+		Info info = ASTUtils.getSafeSymbolTable(node).lookup(id);
+		if (info != null) {
+			ASTUtils.setType(node, info.getType());
+			System.out.println("LValue " + id + " has type " + info.getType() + "!");
+		} else {
+			ASTUtils.setType(node, Type.VOID_TYPE);
+			ASTUtils.error(node, "LValue " + id + " not declared");
+		}
+		
 	}
 
 	@Override
