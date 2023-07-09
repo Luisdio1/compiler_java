@@ -20,5 +20,4 @@ public class PrintInstr implements Instruction{
 	public String emit() {
 		return "print ( " + arg1 + " )";
 	}
-
 }

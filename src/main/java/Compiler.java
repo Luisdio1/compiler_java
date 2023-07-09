@@ -1,4 +1,3 @@
-
 import ast.ASTNode;
 import ast.ASTVisitor;
 import org.slf4j.Logger;
@@ -30,33 +29,37 @@ public class Compiler {
                     java.io.FileInputStream stream = new java.io.FileInputStream(args[i]);
                     LOGGER.info("Scanning file " + args[i]);
                     java.io.Reader reader = new java.io.InputStreamReader(stream, encodingName);
+                    // LEXER
                     lexer = new Lexer(reader);
                     
-                    // parse
+                    // PARSER
                     parser p = new parser(lexer);
                     ASTNode program = (ASTNode) p.parse().value;
                     LOGGER.info("Constructed AST");
 
-                    // keep global instance of program
+                    // GLOBAL INSTANCE OF THE PROGRAM
 				    Registry.getInstance().setRoot(program);
                     
-                    // build symbol table
+                    // BUILDING SYMBOL TABLE
 				    LOGGER.debug("Building symbol tables");
                     ASTVisitor symTableVisitor = new SymTableBuilderASTVisitor();
 				    program.accept(symTableVisitor);
                     System.out.println("Scope counter is: " + ((SymTableBuilderASTVisitor) symTableVisitor).getScopeCounter());
                     
-                    // construct types
+                    // COLLECTING SYMBOLS
 				    LOGGER.debug("Semantic check (1st pass)");
 				    program.accept(new CollectSymbolsASTVisitor());
+
+                    // COLLECTING TYPES
 				    LOGGER.debug("Semantic check (2nd pass)");
 				    program.accept(new CollectTypesASTVisitor());                  
                     
-                    // print program
+                    // PRINTING AST
                     LOGGER.info("Input:");
                     ASTVisitor printVisitor = new PrintASTVisitor();
                     program.accept(printVisitor);
-                    
+
+                    // PRINTING 3-ADDRESS CODE
                     LOGGER.info("3-address code:");
                     IntermediateCodeASTVisitor threeAddrVisitor = new IntermediateCodeASTVisitor();
                     program.accept(threeAddrVisitor);
@@ -76,5 +79,4 @@ public class Compiler {
             }
         }
     }
-
 }

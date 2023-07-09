@@ -53,5 +53,4 @@ public class BinaryOpInstr implements Instruction{
 	public String emit() {
 		return result + " = " + arg1 + " " + op + " " + arg2;
 	}
-
 }

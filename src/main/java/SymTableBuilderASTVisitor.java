@@ -239,7 +239,6 @@ public class SymTableBuilderASTVisitor implements ASTVisitor {
 	@Override
 	public void visit(ArrayType node) throws ASTVisitorException {
 		ASTUtils.setSymbolTable(node, stack.element());
-		// STH TO DO?
 	}
 
 	@Override
@@ -264,5 +263,4 @@ public class SymTableBuilderASTVisitor implements ASTVisitor {
 	public int getScopeCounter() {
 		return scopeCounter;
 	}
-    
 }

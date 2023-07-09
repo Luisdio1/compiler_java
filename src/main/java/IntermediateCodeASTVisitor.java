@@ -72,8 +72,7 @@ public class IntermediateCodeASTVisitor implements ASTVisitor{
 	@Override
 	public void visit(Program node) throws ASTVisitorException {
 		System.out.println("Visiting Program");
-		node.getFd().accept(this);;
-		
+		node.getFd().accept(this);;	
 	}
 
 	@Override
@@ -111,7 +110,6 @@ public class IntermediateCodeASTVisitor implements ASTVisitor{
 	public void visit(IdentifierExpression node) throws ASTVisitorException {
 		System.out.println("Visiting IdentifierExpression");
 		stack.push(node.getIdentifier());
-		
 	}
 
 	@Override
@@ -133,7 +131,6 @@ public class IntermediateCodeASTVisitor implements ASTVisitor{
 			AssignInstr instr = new AssignInstr(String.valueOf(node.getLiteral()), t);
 			intermediate.add(instr);
 		}
-		
 	}
 
 	@Override
@@ -157,8 +154,7 @@ public class IntermediateCodeASTVisitor implements ASTVisitor{
 			String t = createTemp();
 			stack.push(t);
 			intermediate.add(new AssignInstr("\"" + StringEscapeUtils.escapeJava(node.getLiteral()) + "\"", t));
-		}
-		
+		}	
 	}
 
 	@Override
@@ -228,8 +224,6 @@ public class IntermediateCodeASTVisitor implements ASTVisitor{
 			
 		ASTUtils.getTrueListCondition(node).add(condJumpInstr);
 		ASTUtils.getFalseListCondition(node).add(goToInstr);
-		
-		// Intermediate.backpatch(ASTUtils.getTrueList(node.getExpression1()), goToInstr);
 	}
 
 	@Override
@@ -299,8 +293,7 @@ public class IntermediateCodeASTVisitor implements ASTVisitor{
 	@Override
 	public void visit(FunctionParameterDefinition node) throws ASTVisitorException {
 		System.out.println("Visiting FunctionParameterDefinition");
-		// TODO Auto-generated method stub
-		
+		// Nothing to do	
 	}
 
 	@Override
@@ -320,7 +313,7 @@ public class IntermediateCodeASTVisitor implements ASTVisitor{
 	@Override
 	public void visit(EmptyStatement node) throws ASTVisitorException {
 		System.out.println("Visiting EmptyStatement");
-		// TODO Auto-generated method stub
+		// Nothing to do
 		
 	}
 
@@ -355,22 +348,19 @@ public class IntermediateCodeASTVisitor implements ASTVisitor{
 	public void visit(ReturnStatement node) throws ASTVisitorException {
 		System.out.println("Visiting ReturnStatement");
 		node.getExpression().accept(this);
-		
 	}
 
 	@Override
 	public void visit(VariableDefinition node) throws ASTVisitorException {
 		System.out.println("Visiting VariableDefinition");
-		// TODO Auto-generated method stub
-		
+		// Nothing to do
 	}
 
 	@Override
 	public void visit(LValueExpression node) throws ASTVisitorException {
 		System.out.println("Visiting LValueExpression");
 		node.getExpression1().accept(this);
-		node.getExpression2().accept(this);
-		
+		node.getExpression2().accept(this);	
 	}
 
 	@Override
@@ -379,14 +369,12 @@ public class IntermediateCodeASTVisitor implements ASTVisitor{
 		for (Definition par : node.getParameters()) {
 			par.accept(this);
 		}
-		
 	}
 
 	@Override
 	public void visit(ArrayType node) throws ASTVisitorException {
 		System.out.println("Visiting ArrayTypre");
-		// TODO Auto-generated method stub
-		
+		// Nothing to do	
 	}
 
 	@Override
@@ -405,5 +393,4 @@ public class IntermediateCodeASTVisitor implements ASTVisitor{
 		intermediate.add(instr);
 		stack.push(result);
 	}
-
 }

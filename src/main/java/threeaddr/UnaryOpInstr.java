@@ -42,5 +42,4 @@ public class UnaryOpInstr implements Instruction{
 	public String emit() {
 		return result + " = " + op + " " + arg1;
 	}
-
 }

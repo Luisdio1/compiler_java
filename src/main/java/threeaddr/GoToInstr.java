@@ -28,5 +28,4 @@ public class GoToInstr implements Instruction {
 			return "goto " + target.getName();
 		}
 	}
-
 }

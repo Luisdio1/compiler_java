@@ -6,7 +6,6 @@ import threeaddr.GoToInstr;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.objectweb.asm.Type;
 
 public class ASTUtils {
@@ -140,6 +139,4 @@ public class ASTUtils {
 	public static void error(ASTNode node, String message) throws ASTVisitorException {
 		throw new ASTVisitorException(node.getLine() + ":" + node.getColumn() + ": " + message);
 	}
-
-
 }

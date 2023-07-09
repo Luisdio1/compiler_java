@@ -1,5 +1,3 @@
-// NEEDS CHANGES!!!
-
 import ast.ASTUtils;
 import ast.ASTVisitor;
 import ast.ASTVisitorException;
@@ -66,7 +64,7 @@ public class CollectTypesASTVisitor implements ASTVisitor {
 			if (node.getExpression1().getClass() == IdentifierExpression.class) {
 				IdentifierExpression expression = (IdentifierExpression) node.getExpression1();
 				id = expression.getIdentifier();
-			} else if (node.getExpression1().getClass() == LValueExpression.class ){
+			} else if (node.getExpression1().getClass() == LValueExpression.class ) {
 				LValueExpression expression = (LValueExpression) node.getExpression1();
 				if (expression.getExpression1().getClass() == IdentifierExpression.class) {
 					IdentifierExpression identifierExpression = (IdentifierExpression) expression.getExpression1();
@@ -215,7 +213,7 @@ public class CollectTypesASTVisitor implements ASTVisitor {
 		} catch (TypeException e) {
 			ASTUtils.error(node, e.getMessage() + " because of " + type1 + " and " + type2 + " and " + operator);
 		} finally {
-			System.out.println("BinaryCondition has type " + resultType);
+			System.out.println("BinaryCondition's result has type " + resultType);
 		}
 	}
 
@@ -306,6 +304,7 @@ public class CollectTypesASTVisitor implements ASTVisitor {
 			String identifier = ie.getIdentifier();
 			SymbolTable<Info> symbolTable = ASTUtils.getSafeSymbolTable(node);
 			if (symbolTable.lookup(identifier) == null) {
+				ASTUtils.setType(node, Type.VOID_TYPE);
 				ASTUtils.error(node, "Function " + identifier + " not defined!");
 			} else {
 				Info info = symbolTable.lookup(identifier);
@@ -314,9 +313,6 @@ public class CollectTypesASTVisitor implements ASTVisitor {
 				ASTUtils.setType(node, type);
 			}
 		}
-		// node.getExpression().accept(this);
-		// ASTUtils.setType(node, ASTUtils.getSafeType(node.getExpression()));
-		ASTUtils.setType(node, Type.VOID_TYPE);
 	}
 
 	@Override
@@ -370,9 +366,7 @@ public class CollectTypesASTVisitor implements ASTVisitor {
 		for (Definition d : node.getParameters()) {
             d.accept(this);
         }
-		// String identifier = node.getIdentifier();
 		Type type = node.getType();
-		System.out.println("I SEE THAT HEADER " + node.getIdentifier() + " HAS TYPE " + type);
 		ASTUtils.setType(node, type);
 	}
 
@@ -383,7 +377,6 @@ public class CollectTypesASTVisitor implements ASTVisitor {
 
 	@Override
 	public void visit(FunctionCallExpression node) throws ASTVisitorException {
-		// node.getExpression().accept(this);
 		for (Expression e: node.getExpressions()) {
             e.accept(this);
         }
@@ -394,5 +387,4 @@ public class CollectTypesASTVisitor implements ASTVisitor {
 			ASTUtils.error(node, "Function " + node.getIdentifier() + " not defined");
 		}
 	}
-    
 }

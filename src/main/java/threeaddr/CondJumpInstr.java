@@ -51,5 +51,4 @@ public class CondJumpInstr extends GoToInstr {
 			return "if " + arg1 + " " + op + " " + arg2 + " goto " + target.getName();
 		}
 	}
-
 }

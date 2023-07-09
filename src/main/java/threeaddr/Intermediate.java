@@ -53,5 +53,4 @@ public class Intermediate {
 		}
 		return sb.toString(); 
 	}
-
 }

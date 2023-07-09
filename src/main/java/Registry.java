@@ -9,9 +9,7 @@ public class Registry {
     }
 
     private static class SingletonHolder {
-
         public static final Registry instance = new Registry();
-
     }
 
     public static Registry getInstance() {

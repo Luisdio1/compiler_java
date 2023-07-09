@@ -89,22 +89,22 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
 
 	@Override
 	public void visit(IdentifierExpression node) throws ASTVisitorException {
-		// Nothing
+		// Nothing to do
 	}
 
 	@Override
 	public void visit(IntegerLiteralExpression node) throws ASTVisitorException {
-		// Nothing
+		// Nothing to do
 	}
 
 	@Override
 	public void visit(CharLiteralExpression node) throws ASTVisitorException {
-		// Nothing
+		// Nothing to do
 	}
 
 	@Override
 	public void visit(StringLiteralExpression node) throws ASTVisitorException {
-		// Nothing
+		// Nothing to do
 	}
 
 	@Override
@@ -163,6 +163,7 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
 	public void visit(FunctionDefinition node) throws ASTVisitorException {
 		SymbolTable<Info> symbolTable = ASTUtils.getSafeSymbolTable(node);
 		/* INSERTING THE LIBRARIES IN THE PROGRAM */
+		System.out.println("HARDCODING LIBRARIES IN THE PROGRAM!!!");
 		List<String> libraries = Arrays.asList("puti", "putc", "puts", 
 													"geti", "getc", "gets", 
 													"abs", "ord", "chr", 
@@ -216,9 +217,6 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
 			} else {
 				System.out.println("LValue " + identifier + " exists in another's func's scope and has type " 
 											 + symbolTable.lookup(identifier).getType() + " !");
-				// Type t = symbolTable.lookup(identifier).getType();
-				// System.out.println("Adding LValue " + identifier + " to this func scope symbol table!");
-				// symbolTable.put(identifier, new Info(identifier, t));
 			}
         }
         node.getStatement().accept(this);
@@ -226,7 +224,7 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
 
 	@Override
 	public void visit(EmptyStatement node) throws ASTVisitorException {
-		// Nothing
+		// Nothing to do
 	}
 
 	@Override
@@ -334,12 +332,11 @@ public class CollectSymbolsASTVisitor implements ASTVisitor {
 
 	@Override
 	public void visit(ArrayType node) throws ASTVisitorException {
-		// Nothing
+		// Nothing to do
 	}
 
 	@Override
 	public void visit(FunctionCallExpression node) throws ASTVisitorException {
-		// node.getExpression().accept(this);
 		for (Expression e: node.getExpressions()) {
 			e.accept(this);
 		}
