@@ -78,17 +78,19 @@ public class IntermediateCodeASTVisitor implements ASTVisitor{
 
 	@Override
 	public void visit(SpacerStatement node) throws ASTVisitorException {
-		System.out.println("Visiting SpacerStatement");
+		System.out.println("Visiting SpacerStatement (Assignment)");
 		node.getExpression1().accept(this);
 		String t1 = stack.pop();
+		System.out.println("SpacerStatement's getExpression1 popped t1: " + t1);		
 		node.getExpression2().accept(this);
 		String t2 = stack.pop();
-		intermediate.add(new AssignInstr(t1, t2));
+		System.out.println("SpacerStatement's getExpression2 popped t2: " + t2);
+		intermediate.add(new AssignInstr(t2, t1));
 	}
 
 	@Override
 	public void visit(StatementGroup node) throws ASTVisitorException {
-		System.out.println("Visiting StatementGroup");
+		System.out.println("Visiting StatementGroup (Block)");
 		Statement s = null, ps;
 		Iterator<Statement> it = node.getStatements().iterator();
 		while (it.hasNext()) {
@@ -97,14 +99,12 @@ public class IntermediateCodeASTVisitor implements ASTVisitor{
 			
 			if(ps != null && !ASTUtils.getNextList(ps).isEmpty()) {
 				Intermediate.backpatch(ASTUtils.getNextList(ps), intermediate.addNewLabel());
-			}
-			
+			}		
 			s.accept(this);
 		}
 		if(s != null && !ASTUtils.getNextList(s).isEmpty()) {
 			Intermediate.backpatch(ASTUtils.getNextList(s), intermediate.addNewLabel());
-		}
-		
+		}	
 	}
 
 	@Override
@@ -201,10 +201,23 @@ public class IntermediateCodeASTVisitor implements ASTVisitor{
 	@Override
 	public void visit(BinaryCondition node) throws ASTVisitorException {
 		System.out.println("Visiting BinaryCondition");
-		node.getExpression1().accept(this);
-		String t1 = stack.pop();
-		node.getExpression2().accept(this);
-		String t2 = stack.pop();
+		String t1 = "", t2 = "";
+		if (node.getExpression1() != null) {
+			node.getExpression1().accept(this);
+			t1 = stack.pop();
+		}
+		if (node.getExpression2() != null) {
+			node.getExpression2().accept(this);
+			t2 = stack.pop();
+		}
+		if (node.getCondition1() != null) {
+			node.getCondition1().accept(this);
+			t1 = stack.pop();
+		}
+		if (node.getCondition2() != null) {
+			node.getCondition2().accept(this);
+			t2 = stack.pop();
+		}
 		if (!node.getOperator().isRelational()) {
 			ASTUtils.error(node, "A not boolean expression used as boolean");
 		}
@@ -222,8 +235,14 @@ public class IntermediateCodeASTVisitor implements ASTVisitor{
 	@Override
 	public void visit(UnaryCondition node) throws ASTVisitorException {
 		System.out.println("Visiting UnaryCondition");
-		// TODO Auto-generated method stub
-		
+		node.getCondition().accept(this);
+		String t1 = stack.pop();
+		String t = createTemp();
+		stack.push(t);
+		if (!node.getOperator().isRelational()) {
+			ASTUtils.error(node, "A not boolean expression used as boolean");
+		}
+		intermediate.add(new UnaryOpInstr(node.getOperator(),t1, t));	
 	}
 
 	@Override
@@ -376,11 +395,12 @@ public class IntermediateCodeASTVisitor implements ASTVisitor{
 	@Override
 	public void visit(FunctionCallExpression node) throws ASTVisitorException {
 		System.out.println("Visiting FunctionCallExpression");
+		node.getExpression().accept(this);
 		for (Expression exp : node.getExpressions()) {
 			exp.accept(this);
 		}
 		List<String> args = new ArrayList<String>();
-		for (int i = 0; i < node.getExpressions().size(); i++) {
+		for (int i = 0; i < node.getExpressions().size()+1; i++) {
 			args.add(stack.pop());
 		}
 		String result = createTemp();
