@@ -7,12 +7,10 @@ import java.util.List;
 public class FunctionCallExpression extends Expression {
 
     private String identifier;
-    private Expression expression;
     private List<Expression> expressions;
 
-    public FunctionCallExpression(String identifier, Expression expression, List<Expression> expressions) {
+    public FunctionCallExpression(String identifier, List<Expression> expressions) {
         this.identifier = identifier;
-        this.expression = expression;
         this.expressions = expressions;
     }
 
@@ -22,14 +20,6 @@ public class FunctionCallExpression extends Expression {
 
     public void setIdentifier(String identifer) {
         this.identifier = identifer;
-    }
-
-    public Expression getExpression() {
-        return expression;
-    }
-
-    public void setExpression(Expression expression) {
-        this.expression = expression;
     }
 
     public List<Expression> getExpressions() {

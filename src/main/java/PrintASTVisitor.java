@@ -150,10 +150,11 @@ public class PrintASTVisitor implements ASTVisitor {
 	public void visit(FunctionCallExpression node) throws ASTVisitorException {
 		System.out.print(node.getIdentifier());
         System.out.print("(");
-        node.getExpression().accept(this);
         for(Expression e: node.getExpressions()) {
-            System.out.print(", ");
             e.accept(this);
+            if (e != node.getExpressions().get(node.getExpressions().size() - 1)) {
+                System.out.print(", ");
+            }
         }
         System.out.print(")");
 	}

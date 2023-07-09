@@ -380,12 +380,11 @@ public class IntermediateCodeASTVisitor implements ASTVisitor{
 	@Override
 	public void visit(FunctionCallExpression node) throws ASTVisitorException {
 		System.out.println("Visiting FunctionCallExpression");
-		node.getExpression().accept(this);
 		for (Expression exp : node.getExpressions()) {
 			exp.accept(this);
 		}
 		List<String> args = new ArrayList<String>();
-		for (int i = 0; i < node.getExpressions().size()+1; i++) {
+		for (int i = 0; i < node.getExpressions().size(); i++) {
 			args.add(stack.pop());
 		}
 		String result = createTemp();

@@ -102,6 +102,7 @@ non terminal List<String> ids;
 non terminal List<Integer> arrays;
 non terminal Expression expr;
 non terminal List<Expression> exprs;
+non terminal List<Expression> more_exprs;
 non terminal Condition cond;
 
 precedence left OR;
@@ -319,13 +320,22 @@ stmts ::= stmt:s stmts:ss
             {:  RESULT = new ArrayList<Statement>();  :}
         ;
 
-func_call ::= IDENTIFIER:i LPAREN:lp expr:e exprs:es RPAREN
+func_call ::= IDENTIFIER:i LPAREN:lp more_exprs:es RPAREN
             {:
-                RESULT = new FunctionCallExpression(i, e, es);
+                RESULT = new FunctionCallExpression(i, es);
                 RESULT.setLine(ileft);
                 RESULT.setColumn(iright);
             :}
            ;
+
+more_exprs ::= expr:e exprs:es
+            {:
+                es.add(e);
+                RESULT = es;
+            :}
+            | /* nothing */
+            {:  RESULT = new ArrayList<Expression>();  :}
+            ;
 
 exprs ::= COMMA expr:e exprs:es
             {:
