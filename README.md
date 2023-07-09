@@ -4,7 +4,7 @@
 * ### Then to syntax analysis, according to the rules in src/main/cup/grammar.cup 
 * ### Prints the Abstract Syntax Tree (AST)
 * ### Creates SymbolTable, and inserts Symbols and Types in it
-* ### Produces 3-Address Code, but in wrong order
+* ### Produces 3-Address Code, but in wrong order (and doesn't support arrays)
 
 # Compilation Instructions
 
