@@ -1,3 +1,4 @@
+\$\$ Fifth Example \$\$
 fun main () : nothing
     var r : char[32];
 
