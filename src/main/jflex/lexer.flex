@@ -31,7 +31,7 @@ import java_cup.runtime.Symbol;
 LineTerminator = \r|\n|\r\n
 WhiteSpace     = {LineTerminator} | [ \t\f] 
 Comment        = "\\\$\\\$" [^$] ~"\\\$\\\$" | "\\\$\\\$" "\\\$"+ "\\\$"
-SingleComment  = "\\\$" [^$] ~{WhiteSpace}
+SingleComment  = "\\\$" [^$] ~{LineTerminator}
 
 Identifier     = [:jletter:] [:jletterdigit:]*
 IntegerLiteral = 0 | [1-9][0-9]*

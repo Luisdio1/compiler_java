@@ -1,4 +1,4 @@
-\$ First
+\$ First Example
 fun hello (): nothing
     var x : int;
     fun goodbye(): nothing
