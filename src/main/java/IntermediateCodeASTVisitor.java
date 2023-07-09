@@ -79,11 +79,9 @@ public class IntermediateCodeASTVisitor implements ASTVisitor{
 	public void visit(SpacerStatement node) throws ASTVisitorException {
 		System.out.println("Visiting SpacerStatement (Assignment)");
 		node.getExpression1().accept(this);
-		String t1 = stack.pop();
-		System.out.println("SpacerStatement's getExpression1 popped t1: " + t1);		
+		String t1 = stack.pop();		
 		node.getExpression2().accept(this);
 		String t2 = stack.pop();
-		System.out.println("SpacerStatement's getExpression2 popped t2: " + t2);
 		intermediate.add(new AssignInstr(t2, t1));
 	}
 
